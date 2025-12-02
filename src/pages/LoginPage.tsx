@@ -5,7 +5,7 @@ import { Button, Input } from '@/components/ui';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const { login, checkAuth } = useAuthStore();
   const [showExternalModal, setShowExternalModal] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,14 +20,27 @@ const LoginPage: React.FC = () => {
     try {
       const success = await login(email, password);
       if (success) {
-        const currentRole = useAuthStore.getState().role;
-        navigate(currentRole === 'team' ? '/my-actions' : '/');
+        // Wait a bit to ensure Zustand persist middleware has saved to localStorage
+        await new Promise(resolve => setTimeout(resolve, 150));
+        
+        // Re-check auth to ensure state is properly synchronized
+        await checkAuth();
+        
+        // Verify authentication state is set
+        const authState = useAuthStore.getState();
+        if (authState.isAuthenticated && authState.user) {
+          const currentRole = authState.role;
+          navigate(currentRole === 'team' ? '/my-actions' : '/');
+        } else {
+          setError('Login failed. Please try again.');
+          setIsLoading(false);
+        }
       } else {
         setError('Invalid email or password');
+        setIsLoading(false);
       }
     } catch (err) {
       setError('An error occurred during login');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -69,7 +82,7 @@ const LoginPage: React.FC = () => {
         {/* Title - Animated */}
         <div className="text-center space-y-1 md:space-y-2 animate-title-entrance">
           <h1 className="text-[16px] md:text-[24px] font-bold text-white drop-shadow-lg transform hover:scale-105 transition-transform duration-300">
-            Audit & Corporate Security
+            Internal Audit
           </h1>
           <p className="text-blue-200 text-xs md:text-sm font-medium animate-fade-in-delay">
             Dashboard Login
