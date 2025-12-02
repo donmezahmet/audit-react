@@ -9,7 +9,7 @@ import { cn } from '@/utils/cn';
 import ResizableTableHeader from '@/components/ResizableTableHeader';
 import ViewAsDropdown from '@/components/ViewAsDropdown';
 import { DepartmentAction } from '@/types/department-actions.types';
-import { normalizeStatus, STATUS_COLORS, getStatusBadgeVariant } from '@/utils/status.utils';
+import { normalizeStatus, getStatusBadgeVariant } from '@/utils/status.utils';
 import { useDepartmentStats } from '@/hooks/useDepartmentStats';
 import { DEPARTMENT_ACTIONS_CONFIG } from '@/config/department-actions.config';
 

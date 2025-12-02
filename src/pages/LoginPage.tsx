@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth.store';
 import { Button, Input } from '@/components/ui';
 
 const LoginPage: React.FC = () => {
-  const navigate = useNavigate();
   const { login } = useAuthStore();
   const [showExternalModal, setShowExternalModal] = useState(false);
   const [email, setEmail] = useState('');

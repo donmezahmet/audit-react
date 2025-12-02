@@ -674,7 +674,7 @@ export const jiraService = {
       statusesToFilter = ['Closed', 'In Progress'];
     }
     
-    let filtered = mockFindingActions.filter(a => statusesToFilter.includes(a.status));
+    let filtered = mockFindingActions.filter(a => a.status && statusesToFilter.includes(a.status));
     if (auditYear) {
       if (auditYear === '2024+') {
         // Filter for years >= 2024
