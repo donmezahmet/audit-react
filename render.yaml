@@ -1,9 +1,9 @@
 services:
   - type: web
     name: audit-dashboard
-    env: static
+    env: node
     buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
+    startCommand: npm start
     pullRequestPreviewsEnabled: false
     headers:
       - path: /*
