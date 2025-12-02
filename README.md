@@ -1,38 +1,38 @@
-# Audit Management System - Proje Blueprint
+# Audit Management System - Project Blueprint
 
-## 📋 İçindekiler
+## 📋 Table of Contents
 
-1. [Genel Bakış](#genel-bakış)
-2. [Sistem Mimarisi](#sistem-mimarisi)
-3. [Sayfa Detayları](#sayfa-detayları)
-   - [Dashboard (Ana Sayfa)](#1-dashboard-ana-sayfa)
-   - [My Actions (Takım Aksiyonları)](#2-my-actions-takım-aksiyonları)
-   - [Department Actions (Departman Aksiyonları)](#3-department-actions-departman-aksiyonları)
-   - [C-Level Actions (Üst Yönetim Aksiyonları)](#4-c-level-actions-üst-yönetim-aksiyonları)
-   - [All Findings Actions (Tüm Bulgular ve Aksiyonlar)](#5-all-findings-actions-tüm-bulgular-ve-aksiyonlar)
-   - [Annual Audit Plan (Yıllık Denetim Planı)](#6-annual-audit-plan-yıllık-denetim-planı)
-   - [Audit Maturity (Denetim Olgunluk)](#7-audit-maturity-denetim-olgunluk)
-   - [Diğer Sayfalar](#diğer-sayfalar)
-4. [Ortak Özellikler](#ortak-özellikler)
-5. [Kullanıcı Rolleri ve Yetkiler](#kullanıcı-rolleri-ve-yetkiler)
-6. [Interaktif Özellikler](#interaktif-özellikler)
-7. [Teknik Detaylar](#teknik-detaylar)
+1. [Overview](#overview)
+2. [System Architecture](#system-architecture)
+3. [Page Details](#page-details)
+   - [Dashboard (Home Page)](#1-dashboard-home-page)
+   - [My Actions (Team Actions)](#2-my-actions-team-actions)
+   - [Department Actions](#3-department-actions)
+   - [C-Level Actions](#4-c-level-actions)
+   - [All Findings Actions](#5-all-findings-actions)
+   - [Annual Audit Plan](#6-annual-audit-plan)
+   - [Audit Maturity](#7-audit-maturity)
+   - [Other Pages](#other-pages)
+4. [Common Features](#common-features)
+5. [User Roles and Permissions](#user-roles-and-permissions)
+6. [Interactive Features](#interactive-features)
+7. [Technical Details](#technical-details)
 
 ---
 
-## Genel Bakış
+## Overview
 
-Bu proje, kurumsal denetim yönetimi için kapsamlı bir web uygulamasıdır. Sistem, denetim bulgularını, aksiyon planlarını, risk yönetimini ve denetim olgunluk değerlendirmelerini merkezi bir platformda yönetmek için tasarlanmıştır.
+This project is a comprehensive web application for corporate audit management. The system is designed to manage audit findings, action plans, risk management, and audit maturity assessments in a centralized platform.
 
-### Sistem Amacı
-- Denetim bulgularının takibi ve yönetimi
-- Aksiyon planlarının oluşturulması ve izlenmesi
-- Risk seviyelerine göre önceliklendirme
-- Yıllık denetim planlarının yönetimi
-- Denetim olgunluk değerlendirmeleri
-- Rol bazlı erişim kontrolü ile güvenli veri yönetimi
+### System Purpose
+- Tracking and management of audit findings
+- Creation and monitoring of action plans
+- Prioritization by risk levels
+- Management of annual audit plans
+- Audit maturity assessments
+- Secure data management with role-based access control
 
-### Teknik Stack
+### Technical Stack
 - **Framework**: React 18 + TypeScript
 - **State Management**: Zustand
 - **Data Fetching**: React Query (TanStack Query)
@@ -63,30 +63,30 @@ npm run preview
 
 ---
 
-## Sistem Mimarisi
+## System Architecture
 
-### Proje Yapısı
+### Project Structure
 ```
 src/
-├── components/          # UI bileşenleri
-│   ├── ui/            # Temel UI bileşenleri (Button, Card, Input, vb.)
-│   ├── charts/        # Chart bileşenleri (PieChart, BarChart, RadarChart, vb.)
-│   ├── layout/        # Layout bileşenleri (Header, Sidebar, MainLayout)
-│   └── dashboard/     # Dashboard özel bileşenleri
-├── pages/              # Sayfa bileşenleri
-├── services/           # API servisleri ve mock data
+├── components/          # UI components
+│   ├── ui/            # Basic UI components (Button, Card, Input, etc.)
+│   ├── charts/        # Chart components (PieChart, BarChart, RadarChart, etc.)
+│   ├── layout/        # Layout components (Header, Sidebar, MainLayout)
+│   └── dashboard/     # Dashboard-specific components
+├── pages/              # Page components
+├── services/           # API services and mock data
 ├── store/              # Zustand state management
 ├── hooks/              # Custom React hooks
-├── types/              # TypeScript type tanımları
-├── utils/              # Yardımcı fonksiyonlar
-└── config/             # Konfigürasyon dosyaları
+├── types/              # TypeScript type definitions
+├── utils/              # Utility functions
+└── config/             # Configuration files
 ```
 
-### Veri Akışı
-1. **API Layer**: `services/` klasöründe API çağrıları ve mock data
-2. **State Management**: Zustand store'ları global state için
-3. **Server State**: React Query ile server state yönetimi
-4. **Component State**: useState ile lokal state yönetimi
+### Data Flow
+1. **API Layer**: API calls and mock data in `services/` folder
+2. **State Management**: Zustand stores for global state
+3. **Server State**: Server state management with React Query
+4. **Component State**: Local state management with useState
 
 ### Path Aliases
 ```typescript
@@ -102,91 +102,91 @@ src/
 
 ---
 
-## Sayfa Detayları
+## Page Details
 
-### 1. Dashboard (Ana Sayfa)
+### 1. Dashboard (Home Page)
 
 **Route**: `/`  
-**Erişim**: `admin`, `team`, `team_manager`, `ceo`
+**Access**: `admin`, `team`, `team_manager`, `ceo`
 
-#### 📊 İçerik
+#### 📊 Content
 
-##### A. Key Metrics (Önemli Metrikler)
-- **4 Ana Metrik Kartı** (Mobilde carousel):
-  1. **Total Findings** - Toplam bulgu sayısı
-  2. **Open Actions** - Açık aksiyon sayısı
-  3. **Overdue Actions** - Gecikmiş aksiyon sayısı
-  4. **Completion Rate** - Tamamlanma oranı yüzdesi
+##### A. Key Metrics
+- **4 Main Metric Cards** (Carousel on mobile):
+  1. **Total Findings** - Total number of findings
+  2. **Open Actions** - Number of open actions
+  3. **Overdue Actions** - Number of overdue actions
+  4. **Completion Rate** - Completion rate percentage
 
-- **Interaktif Özellikler**:
-  - Mobilde swipe ile kartlar arasında geçiş
-  - Her kart tıklanabilir ve ilgili detay sayfasına yönlendirir
+- **Interactive Features**:
+  - Swipe navigation between cards on mobile
+  - Each card is clickable and redirects to the relevant detail page
 
-##### B. Scorecard Filter (Yıl Filtresi)
-- **Konum**: Sayfa üstü, sağ üst köşe
-- **Seçenekler**:
-  - `2024+` - 2024 ve sonrası veriler
-  - `all` - Tüm yıllar
-- **Etki**: Tüm chart ve tabloları filtreler
+##### B. Scorecard Filter (Year Filter)
+- **Location**: Top of page, top right corner
+- **Options**:
+  - `2024+` - Data from 2024 and later
+  - `all` - All years
+- **Effect**: Filters all charts and tables
 
-##### C. View As Dropdown (Admin İçin)
-- **Konum**: Scorecard filter yanında
-- **Özellik**: Admin kullanıcılar başka kullanıcıların görünümüne geçebilir
-- **Filtreleme**: `team`, `team_manager` rolleri
+##### C. View As Dropdown (For Admin)
+- **Location**: Next to scorecard filter
+- **Feature**: Admin users can switch to another user's view
+- **Filtering**: `team`, `team_manager` roles
 
-##### D. Charts (Grafikler)
+##### D. Charts
 
 ###### 1. **Finding Actions Status (Pie Chart)**
-- **Veri**: Aksiyon durumlarına göre dağılım
-- **Durumlar**: Open, Completed, Risk Accepted, Overdue
-- **Renkler**:
-  - Open: Mavi (`rgba(59, 130, 246, 0.8)`)
-  - Completed: Yeşil (`rgba(34, 197, 94, 0.8)`)
-  - Risk Accepted: Mor (`rgba(147, 51, 234, 0.8)`)
-  - Overdue: Kırmızı (`rgba(239, 68, 68, 0.8)`)
-- **Interaktif**:
-  - Pie slice'lara tıklanınca `ActionDetailsModal` açılır
-  - Modal'da o duruma ait tüm aksiyonlar listelenir
-  - Modal'da scroll edilebilir liste
-  - ESC tuşu ile modal kapanır
+- **Data**: Distribution by action status
+- **Statuses**: Open, Completed, Risk Accepted, Overdue
+- **Colors**:
+  - Open: Blue (`rgba(59, 130, 246, 0.8)`)
+  - Completed: Green (`rgba(34, 197, 94, 0.8)`)
+  - Risk Accepted: Purple (`rgba(147, 51, 234, 0.8)`)
+  - Overdue: Red (`rgba(239, 68, 68, 0.8)`)
+- **Interactive**:
+  - Clicking on pie slices opens `ActionDetailsModal`
+  - Modal lists all actions for that status
+  - Scrollable list in modal
+  - ESC key closes modal
 
 ###### 2. **Finding Actions by Lead and Status (Bar Chart)**
-- **Veri**: Audit lead'lere göre aksiyon durumları
-- **Eksenler**:
-  - X: Audit Lead isimleri
-  - Y: Aksiyon sayıları
-- **Gruplar**: Her lead için durum bazlı gruplar (Open, Completed, vb.)
+- **Data**: Action statuses by audit lead
+- **Axes**:
+  - X: Audit Lead names
+  - Y: Action counts
+- **Groups**: Status-based groups for each lead (Open, Completed, etc.)
 
 ###### 3. **Audit Findings by Year and Status (Bar Chart)**
-- **Veri**: Yıllara göre bulgu durumları
-- **Eksenler**:
-  - X: Yıllar (2021-2025)
-  - Y: Bulgu sayıları
-- **Gruplar**: Her yıl için durum bazlı gruplar
-- **Özellikler**:
-  - Bar genişliği optimize edilmiş (dar)
-  - Legend alt kısımda, ortalanmış, bold değil
-  - Legend barlar ile çakışmıyor
+- **Data**: Finding statuses by year
+- **Axes**:
+  - X: Years (2021-2025)
+  - Y: Finding counts
+- **Groups**: Status-based groups for each year
+- **Features**:
+  - Bar width optimized (narrow)
+  - Legend at bottom, centered, not bold
+  - Legend does not overlap with bars
 
 ###### 4. **Finding Actions Age Distribution (Bar Chart)**
-- **Veri**: Aksiyonların yaş dağılımı
-- **Gruplar**: 0-30 gün, 31-60 gün, 61-90 gün, 90+ gün
-- **Renkler**: Yaş aralıklarına göre farklı renkler
+- **Data**: Age distribution of actions
+- **Groups**: 0-30 days, 31-60 days, 61-90 days, 90+ days
+- **Colors**: Different colors by age range
 
 ###### 5. **Audit Maturity (Radar Chart)**
-- **Veri**: Denetim olgunluk skorları
-- **Boyutlar**: 11 farklı boyut, 5 grup altında
-- **Yıllar**: 2024 ve 2025 karşılaştırması
-- **Skor Aralığı**: 0-5
-- **Özellikler**:
-  - Point labels gizli (sayılar görünmez)
-  - Hover'da tooltip ile değerler gösterilir
-  - Format: "Boyut Adı: Değer / 5"
-  - 2024 ve 2025 değerleri farklı renklerle gösterilir
+- **Data**: Audit maturity scores
+- **Dimensions**: 11 different dimensions, grouped under 5 categories
+- **Years**: Comparison of 2024 and 2025
+- **Score Range**: 0-5
+- **Features**:
+  - Point labels hidden (numbers not visible)
+  - Values shown in tooltip on hover
+  - Format: "Dimension Name: Value / 5"
+  - 2024 and 2025 values shown in different colors
 
 ###### 6. **Action Breakdown by Audit & Risk Level (Table)**
-- **Veri**: Audit ve risk seviyesine göre aksiyon/finding dağılımı
-- **Sütunlar**:
+- **Data**: Action/finding distribution by audit and risk level
+- **Columns**:
   - Audit Year
   - Audit Name
   - Critical (Actions/Findings)
@@ -194,122 +194,122 @@ src/
   - Medium (Actions/Findings)
   - Low (Actions/Findings)
   - Total (Actions/Findings)
-- **Tab Modları**: 
-  - `Actions` tab - Aksiyon sayıları
-  - `Findings` tab - Bulgu sayıları
-- **Interaktif**:
-  - Sayılara tıklanınca `ActionsListModal` açılır
-  - Modal'da ilgili audit, risk level ve mode'a göre filtrelenmiş liste
-  - Modal'da scroll edilebilir
-  - ESC tuşu ile kapanır
+- **Tab Modes**: 
+  - `Actions` tab - Action counts
+  - `Findings` tab - Finding counts
+- **Interactive**:
+  - Clicking numbers opens `ActionsListModal`
+  - Modal shows filtered list by relevant audit, risk level, and mode
+  - Scrollable in modal
+  - ESC key closes
 
 ###### 7. **Finding Distribution by Risk Type and Risk Level (Table)**
-- **Veri**: Risk tipi ve seviyesine göre bulgu dağılımı
-- **Sütunlar**:
+- **Data**: Finding distribution by risk type and level
+- **Columns**:
   - Risk Type
   - Critical, High, Medium, Low, Total
 
-##### E. Control Analysis Section (Kontrol Analizi Bölümü)
+##### E. Control Analysis Section
 - **Toggle Button**: "Show Control Analysis Charts" / "Hide Control Analysis Charts"
-- **Özellikler**:
-  - Toggle açıldığında otomatik scroll (200px offset ile)
-  - Sticky toggle (scroll'da sabit kalır)
-- **Chartlar** (Toggle açıldığında görünür):
+- **Features**:
+  - Auto scroll when toggle is opened (200px offset)
+  - Sticky toggle (stays fixed on scroll)
+- **Charts** (Visible when toggle is opened):
   1. Fraud Impact Scorecards
   2. Loss Prevention Impact Scorecards
   3. Fraud Internal Control Chart
   4. Loss Prevention Summary Chart
 
-##### F. All Charts Section (Tüm Chartlar Bölümü)
+##### F. All Charts Section
 - **Toggle Button**: "See All Charts" / "Hide Charts"
-- **Özellikler**:
-  - Toggle açıldığında otomatik scroll (200px offset ile)
+- **Features**:
+  - Auto scroll when toggle is opened (200px offset)
   - Sticky toggle
-- **Chartlar** (Toggle açıldığında görünür):
-  - Ek detay chartları
+- **Charts** (Visible when toggle is opened):
+  - Additional detail charts
 
-##### G. Audit Plan Section (Denetim Planı Bölümü)
+##### G. Audit Plan Section
 - **Toggle Button**: "Show Audit Plan" / "Hide Audit Plan"
-- **Year Filter**: Dropdown ile yıl seçimi
-- **Özellikler**:
-  - Toggle açıldığında otomatik scroll
-  - Sticky toggle (mobilde)
-  - Yıl filtresi ile plan verileri filtrelenir
+- **Year Filter**: Year selection via dropdown
+- **Features**:
+  - Auto scroll when toggle is opened
+  - Sticky toggle (on mobile)
+  - Plan data filtered by year filter
 
 ##### H. Actions Modals
-- **Overdue Actions Modal**: Gecikmiş aksiyonlar listesi
-- **Upcoming Actions Modal**: Yaklaşan aksiyonlar listesi
-- **Özellikler**:
-  - Modal açıldığında otomatik scroll
-  - ESC tuşu ile kapanır
-  - Liste scroll edilebilir
+- **Overdue Actions Modal**: List of overdue actions
+- **Upcoming Actions Modal**: List of upcoming actions
+- **Features**:
+  - Auto scroll when modal opens
+  - ESC key closes
+  - Scrollable list
 
 ##### I. Investigations Card
-- **Konum**: Sayfa altında
-- **İçerik**: Investigation sayıları ve durumları
+- **Location**: Bottom of page
+- **Content**: Investigation counts and statuses
 
-#### 📱 Mobil Özellikler
-- Responsive tasarım
-- Touch swipe ile carousel navigasyonu
-- Mobilde chart'lar optimize edilmiş boyutlarda
-- Sticky toggle butonları
+#### 📱 Mobile Features
+- Responsive design
+- Touch swipe for carousel navigation
+- Charts optimized for mobile sizes
+- Sticky toggle buttons
 
 ---
 
-### 2. My Actions (Takım Aksiyonları)
+### 2. My Actions (Team Actions)
 
 **Route**: `/my-actions`  
-**Erişim**: `admin`, `team`, `team_manager`
+**Access**: `admin`, `team`, `team_manager`
 
-#### 📊 İçerik
+#### 📊 Content
 
 ##### A. Header
-- **Başlık**: "My Team Actions"
-- **Açıklama**: Role göre değişir
+- **Title**: "My Team Actions"
+- **Description**: Varies by role
   - `team_manager`: "Actions managed by your team"
-  - Diğer: "Actions from your manager's team"
-- **View As Dropdown** (Admin için):
-  - `team`, `team_manager` rolleri filtrelenir
+  - Others: "Actions from your manager's team"
+- **View As Dropdown** (For Admin):
+  - `team`, `team_manager` roles filtered
 
 ##### B. Scorecard Filter
-- **Seçenekler**: `2024+`, `all`
-- **Etki**: Tablo verilerini filtreler
+- **Options**: `2024+`, `all`
+- **Effect**: Filters table data
 
-##### C. Stats Cards (İstatistik Kartları)
-- **Total Actions**: Toplam aksiyon sayısı
-- **Open**: Açık aksiyon sayısı
-- **Overdue**: Gecikmiş aksiyon sayısı
-- **Completed**: Tamamlanmış aksiyon sayısı
-- **Financial Impact**: Finansal etki toplamı
-- **Completion Rate**: Tamamlanma oranı yüzdesi
+##### C. Stats Cards
+- **Total Actions**: Total action count
+- **Open**: Open action count
+- **Overdue**: Overdue action count
+- **Completed**: Completed action count
+- **Financial Impact**: Total financial impact
+- **Completion Rate**: Completion rate percentage
 
-##### D. Actions Table (Aksiyonlar Tablosu)
-- **Sütunlar**:
+##### D. Actions Table
+- **Columns**:
   - Key (Purple, monospace)
   - Summary
   - Description
-  - Status (Badge ile)
+  - Status (with Badge)
   - Audit
   - Due Date
-  - Risk Level (Badge ile)
+  - Risk Level (with Badge)
   - Responsible
-  - Actions (View/Edit butonları)
-- **Özellikler**:
-  - **Resizable Columns**: Sütun genişlikleri ayarlanabilir
-  - **Drag & Drop Reordering**: Sütun sırası değiştirilebilir
-  - **Sorting**: Sütun başlıklarına tıklayarak sıralama
-  - **Pagination**: Sayfa başına 25, 50, 100 seçenekleri
-  - **Search**: Genel arama kutusu
+  - Actions (View/Edit buttons)
+- **Features**:
+  - **Resizable Columns**: Column widths can be adjusted
+  - **Drag & Drop Reordering**: Column order can be changed
+  - **Sorting**: Click column headers to sort
+  - **Pagination**: 25, 50, 100 items per page options
+  - **Search**: General search box
   - **Filters**:
     - Status Filter (Dropdown)
     - Audit Filter (Dropdown)
     - Risk Level Filter (Dropdown)
-  - **Reset Filters**: Tüm filtreleri sıfırlama butonu
-  - **Export**: Excel export butonu
+  - **Reset Filters**: Button to reset all filters
+  - **Export**: Excel export button
 
 ##### E. Action Detail Modal
-- **Trigger**: Tablodaki "View" butonu
-- **İçerik**:
+- **Trigger**: "View" button in table
+- **Content**:
   - Key
   - Summary
   - Description
@@ -319,51 +319,51 @@ src/
   - Risk Level
   - Responsible
   - Financial Impact
-- **Özellikler**:
-  - ESC tuşu ile kapanır
-  - Scroll edilebilir içerik
+- **Features**:
+  - ESC key closes
+  - Scrollable content
 
-##### F. Expanded Row View (Mobil)
-- **Trigger**: Satıra tıklama
-- **İçerik**: Tüm action detayları expandable row içinde
+##### F. Expanded Row View (Mobile)
+- **Trigger**: Click on row
+- **Content**: All action details in expandable row
 
 ---
 
-### 3. Department Actions (Departman Aksiyonları)
+### 3. Department Actions
 
 **Route**: `/department-actions`  
-**Erişim**: `admin`, `department_director`, `action_operator`
+**Access**: `admin`, `department_director`, `action_operator`
 
-#### 📊 İçerik
+#### 📊 Content
 
 ##### A. Header
-- **Başlık**: "Department Actions"
-- **Açıklama**: Kullanıcının departmanına göre dinamik
-- **View As Dropdown** (Admin için):
-  - Sadece `department_director` rolleri
+- **Title**: "Department Actions"
+- **Description**: Dynamic based on user's department
+- **View As Dropdown** (For Admin):
+  - Only `department_director` roles
 
 ##### B. Scorecard Filter
-- **Seçenekler**: `2024+`, `all`
-- **Görsel**: Takvim ikonu ile
+- **Options**: `2024+`, `all`
+- **Visual**: Calendar icon
 
 ##### C. Status Distribution Chart (Donut Chart)
-- **Veri**: Departman aksiyonlarının durum dağılımı
-- **Renkler**: Dashboard ile aynı (Open: Mavi, Completed: Yeşil, vb.)
-- **Özellikler**:
-  - Hover'da tooltip
-  - Responsive tasarım
+- **Data**: Status distribution of department actions
+- **Colors**: Same as Dashboard (Open: Blue, Completed: Green, etc.)
+- **Features**:
+  - Tooltip on hover
+  - Responsive design
 
 ##### D. Stats Cards
-- **Total**: Toplam aksiyon sayısı
-- **Open**: Açık aksiyon sayısı
-- **Overdue**: Gecikmiş aksiyon sayısı
-- **Completed**: Tamamlanmış aksiyon sayısı
-- **Financial Impact**: Finansal etki
-- **Completion Rate**: Tamamlanma oranı
+- **Total**: Total action count
+- **Open**: Open action count
+- **Overdue**: Overdue action count
+- **Completed**: Completed action count
+- **Financial Impact**: Financial impact
+- **Completion Rate**: Completion rate
 
 ##### E. Actions Table
-- **Sütunlar**: My Actions ile benzer
-- **Özellikler**:
+- **Columns**: Similar to My Actions
+- **Features**:
   - Resizable columns
   - Drag & drop reordering
   - Sorting
@@ -373,76 +373,76 @@ src/
   - Export
 
 ##### F. Action Detail Modal
-- My Actions ile aynı özellikler
+- Same features as My Actions
 
 ---
 
-### 4. C-Level Actions (Üst Yönetim Aksiyonları)
+### 4. C-Level Actions
 
 **Route**: `/clevel-actions`  
-**Erişim**: `admin`, `top_management`
+**Access**: `admin`, `top_management`
 
-#### 📊 İçerik
+#### 📊 Content
 
 ##### A. Header
-- **Başlık**: "C-Level Actions"
-- **Açıklama**: "Executive-level audit finding actions overview"
-- **View As Dropdown** (Admin için):
-  - Sadece `top_management` rolleri
+- **Title**: "C-Level Actions"
+- **Description**: "Executive-level audit finding actions overview"
+- **View As Dropdown** (For Admin):
+  - Only `top_management` roles
 
 ##### B. Scorecard Filter
-- **Seçenekler**: `2024+`, `all`
+- **Options**: `2024+`, `all`
 
 ##### C. Status Distribution Chart (Donut Chart)
-- **Veri**: C-Level aksiyonlarının durum dağılımı
-- **Özellikler**: Department Actions ile benzer
+- **Data**: Status distribution of C-Level actions
+- **Features**: Similar to Department Actions
 
 ##### D. Stats Cards
-- **Total**: Toplam aksiyon sayısı
-- **Open**: Açık aksiyon sayısı
-- **Overdue**: Gecikmiş aksiyon sayısı
-- **Completed**: Tamamlanmış aksiyon sayısı
-- **Financial Impact**: Finansal etki
-- **Completion Rate**: Tamamlanma oranı
-- **Overdue Rate**: Gecikme oranı
-- **Money Open**: Açık aksiyonların finansal etkisi
-- **Money Overdue**: Gecikmiş aksiyonların finansal etkisi
+- **Total**: Total action count
+- **Open**: Open action count
+- **Overdue**: Overdue action count
+- **Completed**: Completed action count
+- **Financial Impact**: Financial impact
+- **Completion Rate**: Completion rate
+- **Overdue Rate**: Overdue rate
+- **Money Open**: Financial impact of open actions
+- **Money Overdue**: Financial impact of overdue actions
 
 ##### E. Actions Table
-- **Sütunlar**: 
+- **Columns**: 
   - Key, Summary, Description, Status, Audit, Due Date, Risk Level, Responsible, C-Level, Actions
-- **Özellikler**: Diğer sayfalarla aynı
+- **Features**: Same as other pages
 
 ##### F. Action Detail Modal
-- Diğer sayfalarla aynı özellikler
+- Same features as other pages
 
 ---
 
-### 5. All Findings Actions (Tüm Bulgular ve Aksiyonlar)
+### 5. All Findings Actions
 
 **Route**: `/all-findings-actions`  
-**Erişim**: `admin`, `team`, `team_manager`
+**Access**: `admin`, `team`, `team_manager`
 
-#### 📊 İçerik
+#### 📊 Content
 
 ##### A. Header
-- **Başlık**: "All Findings & Actions"
-- **Açıklama**: "Comprehensive view of all audit findings and actions"
+- **Title**: "All Findings & Actions"
+- **Description**: "Comprehensive view of all audit findings and actions"
 
 ##### B. Scorecard Filter
-- **Seçenekler**: `2024+`, `all`
+- **Options**: `2024+`, `all`
 
 ##### C. Report Chatbot
-- **Konum**: Sayfa üstü, sağ tarafta
-- **Özellikler**:
-  - Doğal dil ile filtreleme
-  - Örnek: "Show me all overdue actions from Financial Audit"
-  - Filtreleri otomatik parse eder ve uygular
-  - Active filters badge'leri gösterir
-  - Filter'ları kaldırma özelliği
+- **Location**: Top of page, right side
+- **Features**:
+  - Natural language filtering
+  - Example: "Show me all overdue actions from Financial Audit"
+  - Automatically parses and applies filters
+  - Shows active filter badges
+  - Remove filter feature
 
 ##### D. Dynamic Filters
-- **Filter Menu**: "+ Add Filter" butonu
+- **Filter Menu**: "+ Add Filter" button
 - **Filter Fields**:
   - Status
   - Audit Name
@@ -450,13 +450,13 @@ src/
   - Risk Level
   - Action Responsible
   - C-Level
-- **Active Filters**: Seçili filtreler badge olarak gösterilir
-- **Remove Filter**: Her badge'de X butonu
+- **Active Filters**: Selected filters shown as badges
+- **Remove Filter**: X button on each badge
 
 ##### E. Actions Table
-- **Sütunlar**: 
+- **Columns**: 
   - Key, Summary, Description, Status, Audit, Due Date, Risk Level, Responsible, C-Level, Actions
-- **Özellikler**: 
+- **Features**: 
   - Resizable columns
   - Drag & drop reordering
   - Sorting
@@ -466,44 +466,44 @@ src/
   - Dynamic filtering (chatbot + manual)
 
 ##### F. Action Detail Modal
-- Diğer sayfalarla aynı özellikler
+- Same features as other pages
 
 ---
 
-### 6. Annual Audit Plan (Yıllık Denetim Planı)
+### 6. Annual Audit Plan
 
 **Route**: `/annual-audit-plan`  
-**Erişim**: `admin`
+**Access**: `admin`
 
-#### 📊 İçerik
+#### 📊 Content
 
 ##### A. Header
-- **Başlık**: "Annual Audit Plan"
-- **Açıklama**: "Manage and track annual audit plans"
+- **Title**: "Annual Audit Plan"
+- **Description**: "Manage and track annual audit plans"
 
 ##### B. View Mode Toggle
-- **Seçenekler**:
-  1. **Progress View** (Varsayılan)
-     - Progress chart ile görselleştirme
+- **Options**:
+  1. **Progress View** (Default)
+     - Visualization with progress chart
   2. **Kanban View**
      - Kanban board (To Do, In Progress, Completed, On Hold)
   3. **Calendar View**
-     - Takvim görünümü
-     - Tarih filtreleri ile
+     - Calendar view
+     - With date filters
 
 ##### C. Year Filter
-- **Dropdown**: Yıl seçimi
-- **Etki**: Tüm view'ları filtreler
+- **Dropdown**: Year selection
+- **Effect**: Filters all views
 
 ##### D. Actions
-- **Create Plan**: Yeni plan oluşturma butonu
-- **Bulk Upload**: Excel ile toplu yükleme
+- **Create Plan**: Button to create new plan
+- **Bulk Upload**: Bulk upload via Excel
 - **Export**: Excel export
 
 ##### E. Progress View
 - **Chart**: Audit plan progress chart
-- **Veri**: Yıla göre plan durumları
-- **Interaktif**: Chart elementlerine tıklanabilir
+- **Data**: Plan statuses by year
+- **Interactive**: Chart elements are clickable
 
 ##### F. Kanban View
 - **Columns**: 
@@ -511,8 +511,8 @@ src/
   - In Progress
   - Completed
   - On Hold
-- **Drag & Drop**: Kartlar sütunlar arası taşınabilir
-- **Kart Detayları**: 
+- **Drag & Drop**: Cards can be moved between columns
+- **Card Details**: 
   - Audit Name
   - Status
   - Lead
@@ -520,15 +520,15 @@ src/
   - Risk Level
 
 ##### G. Calendar View
-- **Takvim Görünümü**: Aylık takvim
-- **Filtreler**:
+- **Calendar View**: Monthly calendar
+- **Filters**:
   - Date Range
   - Audit Leads (Multi-select)
-- **Events**: Planlar takvim üzerinde gösterilir
-- **Interaktif**: Event'lere tıklanınca detay modal açılır
+- **Events**: Plans shown on calendar
+- **Interactive**: Clicking events opens detail modal
 
 ##### H. Audit Plan Form Modal
-- **Trigger**: "Create Plan" veya "Edit" butonu
+- **Trigger**: "Create Plan" or "Edit" button
 - **Fields**:
   - Audit Name
   - Audit Year
@@ -538,20 +538,20 @@ src/
   - Status
   - Risk Level
   - Description
-- **Özellikler**:
+- **Features**:
   - Validation
-  - ESC tuşu ile kapanır
-  - Save/Cancel butonları
+  - ESC key closes
+  - Save/Cancel buttons
 
 ##### I. Audit Plan Detail Modal
-- **Trigger**: Plan kartına/event'ine tıklama
-- **İçerik**: Plan detayları
+- **Trigger**: Click on plan card/event
+- **Content**: Plan details
 - **Actions**: Edit, Delete, Status Change
 
 ##### J. Bulk Upload Modal
-- **Trigger**: "Bulk Upload" butonu
-- **Özellikler**:
-  - Excel dosyası yükleme
+- **Trigger**: "Bulk Upload" button
+- **Features**:
+  - Excel file upload
   - Preview
   - Validation
   - Error handling
@@ -559,273 +559,273 @@ src/
 
 ---
 
-### 7. Audit Maturity (Denetim Olgunluk)
+### 7. Audit Maturity
 
 **Route**: `/audit-maturity`  
-**Erişim**: `admin`
+**Access**: `admin`
 
-#### 📊 İçerik
+#### 📊 Content
 
 ##### A. Header
-- **Başlık**: "Audit Maturity Assessment"
-- **Açıklama**: "Track audit maturity scores and progress"
+- **Title**: "Audit Maturity Assessment"
+- **Description**: "Track audit maturity scores and progress"
 
 ##### B. MAT Scores Table
-- **Veri Kaynağı**: Jira MAT project
-- **Sütunlar**:
-  - Object (Denetim objesi)
-  - Score (0-5 arası skor)
-  - Status (Durum)
-- **Renk Kodlaması**:
-  - Score >= 4: Yeşil
-  - Score >= 3: Mavi
-  - Score >= 2: Sarı
-  - Score < 2: Kırmızı
+- **Data Source**: Jira MAT project
+- **Columns**:
+  - Object (Audit object)
+  - Score (0-5 score)
+  - Status
+- **Color Coding**:
+  - Score >= 4: Green
+  - Score >= 3: Blue
+  - Score >= 2: Yellow
+  - Score < 2: Red
 
 ##### C. Google Sheets Data Table
-- **Veri Kaynağı**: Google Sheets entegrasyonu
-- **Dinamik Sütunlar**: Sheet'teki kolonlara göre
-- **Özellikler**: 
+- **Data Source**: Google Sheets integration
+- **Dynamic Columns**: Based on sheet columns
+- **Features**: 
   - Hover effects
   - Responsive
 
 ##### D. Maturity Overview
-- **Chart**: Maturity skorları görselleştirmesi
-- **Trend Analysis**: Zaman içindeki değişimler
+- **Chart**: Maturity scores visualization
+- **Trend Analysis**: Changes over time
 
 ---
 
-## Diğer Sayfalar
+## Other Pages
 
 ### Access Management
 **Route**: `/access-management`  
-**Erişim**: `admin`  
-**İçerik**: Kullanıcı ve rol yönetimi
+**Access**: `admin`  
+**Content**: User and role management
 
 ### Risk Management
 **Route**: `/risk-management`  
-**Erişim**: `admin`  
-**İçerik**: Risk değerlendirme ve takibi
+**Access**: `admin`  
+**Content**: Risk assessment and tracking
 
 ### Audit Finding
 **Route**: `/audit-findings`  
-**Erişim**: `admin`  
-**İçerik**: Denetim bulguları yönetimi
+**Access**: `admin`  
+**Content**: Audit findings management
 
 ### Audit Universe
 **Route**: `/audit-universe`  
-**Erişim**: `admin`  
-**İçerik**: Denetim evreni yönetimi
+**Access**: `admin`  
+**Content**: Audit universe management
 
 ### Task Manager
 **Route**: `/tasks`  
-**Erişim**: `admin`, `team`, `team_manager`  
-**İçerik**: Görev yönetim sistemi
+**Access**: `admin`, `team`, `team_manager`  
+**Content**: Task management system
 
 ---
 
-## Ortak Özellikler
+## Common Features
 
 ### 1. View As (Impersonation)
 
-#### Genel Bakış
-View As özelliği, admin kullanıcılarının başka kullanıcıların görünümüne geçmesini sağlar. Bu özellik, destek ve kontrol amaçlı kullanılır.
+#### Overview
+The View As feature allows admin users to switch to another user's view. This feature is used for support and control purposes.
 
-#### Kimler Kullanabilir
-- **Sadece `admin` rolü** View As özelliğini kullanabilir
-- Diğer roller bu özelliği göremez
+#### Who Can Use It
+- **Only `admin` role** can use the View As feature
+- Other roles cannot see this feature
 
-#### Nasıl Çalışır
+#### How It Works
 
-**1. Kullanıcı Seçimi**
-- Admin, View As dropdown butonuna tıklar
-- Dropdown açılır ve filtrelenmiş kullanıcı listesi gösterilir
-- Her sayfada farklı roller filtrelenir:
-  - **Dashboard**: `team`, `team_manager` rolleri
-  - **My Actions**: `team`, `team_manager` rolleri
-  - **Department Actions**: `department_director` rolleri
-  - **C-Level Actions**: `top_management` rolleri
-- Dropdown içinde arama yapılabilir (email veya isim ile)
+**1. User Selection**
+- Admin clicks the View As dropdown button
+- Dropdown opens and shows filtered user list
+- Different roles are filtered on each page:
+  - **Dashboard**: `team`, `team_manager` roles
+  - **My Actions**: `team`, `team_manager` roles
+  - **Department Actions**: `department_director` roles
+  - **C-Level Actions**: `top_management` roles
+- Search can be performed in dropdown (by email or name)
 
-**2. Impersonation Başlatma**
-- Admin, listeden bir kullanıcı seçer
-- Sistem `authService.viewAsUser()` fonksiyonunu çağırır
-- Seçilen kullanıcının bilgileri `userService.getAccessManagementUsers()` ile alınır
-- Kullanıcı bilgileri `localStorage`'a `impersonated_user` key'i ile kaydedilir
-- Orijinal kullanıcı bilgileri `mock_user` key'i ile korunur
+**2. Starting Impersonation**
+- Admin selects a user from the list
+- System calls `authService.viewAsUser()` function
+- Selected user's information is retrieved via `userService.getAccessManagementUsers()`
+- User information is saved to `localStorage` with `impersonated_user` key
+- Original user information is preserved with `mock_user` key
 
-**3. Sayfa Yenileme**
-- Impersonation başarılı olduktan sonra sayfa otomatik olarak reload edilir
-- `authService.getCurrentUser()` fonksiyonu `impersonated_user` key'ini kontrol eder
-- Eğer `impersonated_user` varsa, o kullanıcının bilgileri döndürülür
-- `isImpersonating: true` ve `originalUser` bilgileri set edilir
+**3. Page Reload**
+- After successful impersonation, page is automatically reloaded
+- `authService.getCurrentUser()` function checks `impersonated_user` key
+- If `impersonated_user` exists, that user's information is returned
+- `isImpersonating: true` and `originalUser` information are set
 
-**4. Veri Filtreleme**
-- Sayfa reload olduktan sonra, tüm veri çekme fonksiyonları impersonated user'ın email'ini kullanır
-- Örnek: `getDepartmentFindingActions({ userEmail: impersonatedUser.email })`
-- Tüm chart'lar, tablolar ve listeler seçilen kullanıcıya göre filtrelenmiş verileri gösterir
+**4. Data Filtering**
+- After page reload, all data fetching functions use the impersonated user's email
+- Example: `getDepartmentFindingActions({ userEmail: impersonatedUser.email })`
+- All charts, tables, and lists show data filtered by the selected user
 
-**5. UI Göstergeleri**
-- Header'da "Viewing as [User Name]" mesajı gösterilir
-- View As dropdown'da seçili kullanıcı işaretlenir
-- "Stop Impersonation" butonu görünür hale gelir
+**5. UI Indicators**
+- "Viewing as [User Name]" message shown in header
+- Selected user is marked in View As dropdown
+- "Stop Impersonation" button becomes visible
 
-**6. Impersonation Durdurma**
-- "Stop Impersonation" butonuna tıklanır
-- `authService.stopImpersonation()` fonksiyonu çağrılır
-- `localStorage`'dan `impersonated_user` key'i silinir
-- Sayfa tekrar reload edilir
-- Orijinal kullanıcının verileri geri yüklenir
+**6. Stopping Impersonation**
+- "Stop Impersonation" button is clicked
+- `authService.stopImpersonation()` function is called
+- `impersonated_user` key is removed from `localStorage`
+- Page is reloaded again
+- Original user's data is restored
 
-#### Teknik Detaylar
+#### Technical Details
 
-**localStorage Yapısı:**
+**localStorage Structure:**
 ```javascript
-// Impersonation öncesi
+// Before impersonation
 localStorage.setItem('mock_user', JSON.stringify(originalUser))
 
-// Impersonation sırasında
+// During impersonation
 localStorage.setItem('impersonated_user', JSON.stringify(impersonatedUser))
-localStorage.setItem('mock_user', JSON.stringify(originalUser)) // Korunur
+localStorage.setItem('mock_user', JSON.stringify(originalUser)) // Preserved
 
-// Impersonation sonrası
+// After impersonation
 localStorage.removeItem('impersonated_user')
 ```
 
 **Auth Store State:**
 ```typescript
 {
-  user: impersonatedUser,        // Seçilen kullanıcı
-  role: impersonatedUser.role,   // Seçilen kullanıcının rolü
-  isImpersonating: true,         // Impersonation durumu
-  originalUser: originalUser    // Orijinal admin kullanıcı
+  user: impersonatedUser,        // Selected user
+  role: impersonatedUser.role,   // Selected user's role
+  isImpersonating: true,         // Impersonation status
+  originalUser: originalUser    // Original admin user
 }
 ```
 
-**Veri Filtreleme Mantığı:**
+**Data Filtering Logic:**
 ```typescript
-// Department Actions örneği
+// Department Actions example
 const { data: actions } = useDepartmentFindingActions({
   auditYear: scorecardFilter,
   userEmail: (role === 'admin' && !isImpersonating) 
-    ? undefined  // Admin ve impersonating değilse tüm veriler
-    : user?.email  // Impersonating ise seçilen kullanıcının email'i
+    ? undefined  // Admin and not impersonating, show all data
+    : user?.email  // Impersonating, use selected user's email
 });
 ```
 
-#### Güvenlik Notları
-- Sadece admin rolü bu özelliği kullanabilir
-- Impersonation durumu her sayfa yüklemesinde kontrol edilir
-- Orijinal kullanıcı bilgileri her zaman korunur
-- Logout yapıldığında hem `mock_user` hem de `impersonated_user` temizlenir
+#### Security Notes
+- Only admin role can use this feature
+- Impersonation status is checked on every page load
+- Original user information is always preserved
+- Both `mock_user` and `impersonated_user` are cleared on logout
 
 ### 2. Scorecard Filter
-- **Tüm Sayfalarda**: Yıl bazlı filtreleme
-- **Seçenekler**: `2024+`, `all`
-- **Etki**: Chart ve tablo verilerini filtreler
+- **All Pages**: Year-based filtering
+- **Options**: `2024+`, `all`
+- **Effect**: Filters chart and table data
 
 ### 3. Resizable Columns
-- **Özellik**: Tablo sütun genişlikleri ayarlanabilir
-- **Kayıt**: localStorage'a kaydedilir
-- **Kullanım**: Sütun kenarından sürükleyerek
+- **Feature**: Table column widths can be adjusted
+- **Storage**: Saved to localStorage
+- **Usage**: Drag from column edge
 
 ### 4. Drag & Drop Column Reordering
-- **Özellik**: Sütun sırası değiştirilebilir
-- **Kayıt**: localStorage'a kaydedilir
-- **Kullanım**: Sütun başlığından sürükleyerek
+- **Feature**: Column order can be changed
+- **Storage**: Saved to localStorage
+- **Usage**: Drag from column header
 
 ### 5. Sorting
-- **Özellik**: Sütun başlıklarına tıklayarak sıralama
-- **Durumlar**: Ascending, Descending, None
-- **Görsel**: Ok ikonları ile gösterilir
+- **Feature**: Click column headers to sort
+- **States**: Ascending, Descending, None
+- **Visual**: Shown with arrow icons
 
 ### 6. Pagination
-- **Seçenekler**: 25, 50, 100 items per page
+- **Options**: 25, 50, 100 items per page
 - **Navigation**: Previous, Next, Page numbers
-- **Gösterge**: "Showing X to Y of Z items"
+- **Indicator**: "Showing X to Y of Z items"
 
 ### 7. Search
-- **Özellik**: Genel arama kutusu
-- **Kapsam**: Tüm sütunlarda arama
-- **Real-time**: Yazarken filtreleme
+- **Feature**: General search box
+- **Scope**: Search across all columns
+- **Real-time**: Filters as you type
 
 ### 8. Filters
-- **Türler**: Status, Audit, Risk Level, vb.
-- **Görsel**: Dropdown'lar
-- **Reset**: Tüm filtreleri sıfırlama butonu
-- **Active Filters**: Badge'ler ile gösterilir
+- **Types**: Status, Audit, Risk Level, etc.
+- **Visual**: Dropdowns
+- **Reset**: Button to reset all filters
+- **Active Filters**: Shown as badges
 
 ### 9. Export
 - **Format**: Excel (.xlsx)
-- **İçerik**: Filtrelenmiş tablo verileri
-- **Loading**: Export sırasında loading gösterilir
+- **Content**: Filtered table data
+- **Loading**: Loading shown during export
 
 ### 10. Modals
-- **Kapatma**: 
-  - X butonu
-  - ESC tuşu
-  - Dışarı tıklama (bazı modallarda)
-- **Scroll**: Modal içeriği scroll edilebilir
-- **Responsive**: Mobilde tam ekran
+- **Closing**: 
+  - X button
+  - ESC key
+  - Outside click (in some modals)
+- **Scroll**: Modal content is scrollable
+- **Responsive**: Full screen on mobile
 
 ### 11. Auto Scroll
-- **Kullanım**: 
-  - Toggle açıldığında ilgili bölüme scroll
-  - Modal açıldığında modal'a scroll
-- **Offset**: 200px header için
+- **Usage**: 
+  - Scroll to relevant section when toggle is opened
+  - Scroll to modal when modal opens
+- **Offset**: 200px for header
 
 ### 12. Sticky Elements
-- **Toggle Buttons**: Scroll'da sabit kalır
-- **Header**: Sabit header
-- **Mobil**: Mobilde sticky toggle'lar
+- **Toggle Buttons**: Stay fixed on scroll
+- **Header**: Fixed header
+- **Mobile**: Sticky toggles on mobile
 
 ---
 
-## Kullanıcı Rolleri ve Yetkiler
+## User Roles and Permissions
 
 ### Admin
-- **Tüm Sayfalara Erişim**: ✅
-- **View As**: ✅ (Tüm rollerde)
-- **CRUD İşlemleri**: ✅
+- **Access to All Pages**: ✅
+- **View As**: ✅ (All roles)
+- **CRUD Operations**: ✅
 - **Export**: ✅
 - **Filter Management**: ✅
 
 ### Team Manager
-- **Erişim**:
+- **Access**:
   - Dashboard ✅
   - My Actions ✅
   - All Findings Actions ✅
   - Task Manager ✅
 - **View As**: ❌
-- **CRUD**: Sınırlı (kendi takımı)
+- **CRUD**: Limited (own team)
 - **Export**: ✅
 
 ### Team
-- **Erişim**:
+- **Access**:
   - Dashboard ✅
   - My Actions ✅
   - All Findings Actions ✅
   - Task Manager ✅
 - **View As**: ❌
-- **CRUD**: Sınırlı (kendi aksiyonları)
+- **CRUD**: Limited (own actions)
 - **Export**: ✅
 
 ### Department Director
-- **Erişim**:
+- **Access**:
   - Department Actions ✅
 - **View As**: ❌
-- **CRUD**: Sınırlı (kendi departmanı)
+- **CRUD**: Limited (own department)
 - **Export**: ✅
 
 ### Top Management
-- **Erişim**:
+- **Access**:
   - C-Level Actions ✅
 - **View As**: ❌
-- **CRUD**: Sınırlı (kendi aksiyonları)
+- **CRUD**: Limited (own actions)
 - **Export**: ✅
 
 ### CEO
-- **Erişim**:
+- **Access**:
   - Dashboard ✅
 - **View As**: ❌
 - **CRUD**: ❌
@@ -833,134 +833,134 @@ const { data: actions } = useDepartmentFindingActions({
 
 ---
 
-## Interaktif Özellikler
+## Interactive Features
 
 ### 1. Chart Interactions
 
 #### Pie Chart (Finding Actions Status)
-- **Click**: Pie slice'a tıklanınca modal açılır
-- **Hover**: Tooltip gösterilir
-- **Modal**: ActionDetailsModal açılır, ilgili durumdaki aksiyonlar listelenir
+- **Click**: Clicking pie slice opens modal
+- **Hover**: Tooltip shown
+- **Modal**: ActionDetailsModal opens, lists actions for that status
 
 #### Bar Chart (Audit Findings by Year)
-- **Hover**: Tooltip gösterilir
-- **Legend**: Alt kısımda, tıklanabilir (seri göster/gizle)
+- **Hover**: Tooltip shown
+- **Legend**: At bottom, clickable (show/hide series)
 
 #### Radar Chart (Audit Maturity)
-- **Hover**: Tooltip gösterilir (format: "Boyut: Değer / 5")
-- **Point Labels**: Gizli (sadece hover'da görünür)
-- **Multiple Datasets**: 2024 ve 2025 karşılaştırması
+- **Hover**: Tooltip shown (format: "Dimension: Value / 5")
+- **Point Labels**: Hidden (only visible on hover)
+- **Multiple Datasets**: Comparison of 2024 and 2025
 
 #### Donut Chart (Status Distribution)
-- **Hover**: Tooltip gösterilir
-- **Click**: (Gelecekte modal açılabilir)
+- **Hover**: Tooltip shown
+- **Click**: (Modal can be opened in future)
 
 ### 2. Table Interactions
 
 #### Cell Click (Action Breakdown Table)
-- **Click**: Sayılara tıklanınca modal açılır
-- **Modal**: ActionsListModal açılır
-- **Filtreleme**: Modal'da ilgili audit, risk level ve mode'a göre filtrelenmiş liste
+- **Click**: Clicking numbers opens modal
+- **Modal**: ActionsListModal opens
+- **Filtering**: Modal shows filtered list by relevant audit, risk level, and mode
 
 #### Row Click
-- **Desktop**: "View" butonu ile modal açılır
-- **Mobile**: Satıra tıklanınca expandable row açılır
+- **Desktop**: "View" button opens modal
+- **Mobile**: Clicking row opens expandable row
 
 #### Column Header Click
-- **Sort**: Sıralama toggle'ları (asc → desc → none)
-- **Drag**: Sütun sırası değiştirme
-- **Resize**: Sütun genişliği ayarlama
+- **Sort**: Sort toggles (asc → desc → none)
+- **Drag**: Change column order
+- **Resize**: Adjust column width
 
 ### 3. Filter Interactions
 
 #### Dropdown Filters
-- **Click**: Dropdown açılır
-- **Select**: Seçim yapılınca filtre uygulanır
-- **Clear**: "All" seçeneği ile filtre kaldırılır
+- **Click**: Dropdown opens
+- **Select**: Selection applies filter
+- **Clear**: "All" option removes filter
 
 #### Search Filter
-- **Type**: Real-time filtreleme
-- **Clear**: X butonu ile temizleme
+- **Type**: Real-time filtering
+- **Clear**: Clear with X button
 
 #### Active Filters
-- **Badge Display**: Seçili filtreler badge olarak gösterilir
-- **Remove**: X butonu ile kaldırılır
+- **Badge Display**: Selected filters shown as badges
+- **Remove**: Remove with X button
 
 ### 4. Modal Interactions
 
 #### Opening
-- **Trigger**: Buton, chart element, table cell
+- **Trigger**: Button, chart element, table cell
 - **Animation**: Fade in
-- **Focus**: Modal'a otomatik focus
-- **Scroll Lock**: Body scroll kilitlenir
+- **Focus**: Automatic focus on modal
+- **Scroll Lock**: Body scroll locked
 
 #### Closing
-- **X Button**: Sağ üst köşe
-- **ESC Key**: Klavye kısayolu
-- **Outside Click**: (Bazı modallarda)
+- **X Button**: Top right corner
+- **ESC Key**: Keyboard shortcut
+- **Outside Click**: (In some modals)
 - **Animation**: Fade out
 
 #### Content
-- **Scroll**: İçerik scroll edilebilir
-- **Responsive**: Mobilde tam ekran
+- **Scroll**: Content is scrollable
+- **Responsive**: Full screen on mobile
 
 ### 5. Toggle Interactions
 
 #### Show/Hide Charts
-- **Click**: Toggle butonu
+- **Click**: Toggle button
 - **Animation**: Smooth scroll
-- **Sticky**: Scroll'da sabit kalır
-- **State**: localStorage'a kaydedilir (bazı durumlarda)
+- **Sticky**: Stays fixed on scroll
+- **State**: Saved to localStorage (in some cases)
 
 ### 6. View Mode Toggle (Annual Audit Plan)
-- **Click**: View mode değiştirilir
+- **Click**: View mode changes
 - **Modes**: Progress, Kanban, Calendar
-- **State**: Seçili mode localStorage'a kaydedilir
+- **State**: Selected mode saved to localStorage
 
 ### 7. Kanban Interactions
-- **Drag & Drop**: Kartlar sütunlar arası taşınabilir
-- **Card Click**: Detay modal açılır
-- **Status Update**: Drag ile status güncellenir
+- **Drag & Drop**: Cards can be moved between columns
+- **Card Click**: Detail modal opens
+- **Status Update**: Status updated via drag
 
 ### 8. Calendar Interactions
-- **Date Click**: Tarihe tıklanınca event detayları
-- **Event Click**: Event'e tıklanınca modal açılır
-- **Date Range Filter**: Tarih aralığı seçimi
+- **Date Click**: Clicking date shows event details
+- **Event Click**: Clicking event opens modal
+- **Date Range Filter**: Date range selection
 - **Lead Filter**: Multi-select dropdown
 
 ### 9. Export Interactions
-- **Click**: Export butonu
-- **Loading**: Export sırasında loading gösterilir
-- **Download**: Excel dosyası indirilir
-- **Error Handling**: Hata durumunda mesaj gösterilir
+- **Click**: Export button
+- **Loading**: Loading shown during export
+- **Download**: Excel file downloaded
+- **Error Handling**: Message shown on error
 
 ### 10. View As Interactions
 
-#### Dropdown Açma/Kapama
-- **Trigger**: "View As" butonuna tıklama
-- **İçerik**: Filtrelenmiş kullanıcı listesi (role göre)
-- **Arama**: Dropdown içinde real-time arama (email veya isim)
-- **Kapatma**: Dışarı tıklama veya ESC tuşu
+#### Dropdown Open/Close
+- **Trigger**: Click "View As" button
+- **Content**: Filtered user list (by role)
+- **Search**: Real-time search in dropdown (by email or name)
+- **Close**: Click outside or ESC key
 
-#### Kullanıcı Seçimi
-- **Click**: Listeden bir kullanıcıya tıklama
-- **Loading**: Seçim sırasında loading gösterilir
-- **Success**: Başarılı olursa sayfa reload edilir
-- **Error**: Hata durumunda mesaj gösterilir
+#### User Selection
+- **Click**: Click user in list
+- **Loading**: Loading shown during selection
+- **Success**: Page reloads on success
+- **Error**: Message shown on error
 
-#### Impersonation Durumu
-- **Gösterge**: Header'da "Viewing as [User Name]" mesajı
-- **Dropdown**: Seçili kullanıcı işaretlenir
-- **Stop Button**: "Stop Impersonation" butonu görünür
+#### Impersonation Status
+- **Indicator**: "Viewing as [User Name]" message in header
+- **Dropdown**: Selected user is marked
+- **Stop Button**: "Stop Impersonation" button visible
 
-#### Impersonation Durdurma
-- **Trigger**: "Stop Impersonation" butonuna tıklama
-- **Action**: `localStorage` temizlenir, sayfa reload edilir
-- **Result**: Orijinal kullanıcının görünümüne dönülür
+#### Stopping Impersonation
+- **Trigger**: Click "Stop Impersonation" button
+- **Action**: `localStorage` cleared, page reloads
+- **Result**: Returns to original user's view
 
 ---
 
-## Teknik Detaylar
+## Technical Details
 
 ### State Management
 - **Zustand**: Auth store, UI store
@@ -969,11 +969,11 @@ const { data: actions } = useDepartmentFindingActions({
 
 ### Data Fetching
 - **React Query**: useQuery, useMutation
-- **Custom Hooks**: useDepartmentFindingActions, useCLevelFindingActions, vb.
-- **Caching**: 2 dakika stale time
+- **Custom Hooks**: useDepartmentFindingActions, useCLevelFindingActions, etc.
+- **Caching**: 2 minutes stale time
 
 ### Performance Optimizations
-- **useMemo**: Hesaplanmış değerler
+- **useMemo**: Computed values
 - **useCallback**: Function memoization
 - **React.memo**: Component memoization
 - **Lazy Loading**: Route-based code splitting
@@ -997,6 +997,6 @@ const { data: actions } = useDepartmentFindingActions({
 
 ---
 
-## Sonuç
+## Conclusion
 
-Bu dokümantasyon, projenin tüm özelliklerini, interaktif elementlerini ve kullanıcı akışlarını kapsamaktadır. Sistem mimarisi, kullanıcı rolleri, sayfa yapıları ve teknik detaylar bu dokümanda detaylı olarak açıklanmıştır.
+This documentation covers all features, interactive elements, and user flows of the project. System architecture, user roles, page structures, and technical details are explained in detail in this document.
