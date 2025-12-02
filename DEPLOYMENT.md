@@ -13,7 +13,7 @@
 ### 1. Build for Production
 
 ```bash
-cd client
+npm install
 npm run build
 ```
 

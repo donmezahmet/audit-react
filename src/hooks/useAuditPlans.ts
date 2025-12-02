@@ -80,19 +80,20 @@ export const useCreateAuditPlan = () => {
                 audit_name: newPlan.audit_name || 'New Audit',
                 audit_lead_name: newPlan.audit_lead_name || 'John Doe',
                 audit_lead_email: newPlan.audit_lead_email || 'john.doe@example.com',
-                business_unit: newPlan.business_unit,
-                department: newPlan.department,
-                process: newPlan.process,
-                start_date: newPlan.start_date,
-                end_date: newPlan.end_date,
-                audit_duration_weeks: newPlan.audit_duration_weeks,
-                report_release_date: newPlan.report_release_date,
-                audit_report_rating: newPlan.audit_report_rating,
+                business_unit: newPlan.business_unit || undefined,
+                department: newPlan.department || undefined,
+                process: newPlan.process || undefined,
+                start_date: newPlan.start_date || undefined,
+                end_date: newPlan.end_date || undefined,
+                audit_duration_weeks: newPlan.audit_duration_weeks || undefined,
+                report_release_date: newPlan.report_release_date || undefined,
+                audit_report_rating: newPlan.audit_report_rating || undefined,
                 status: newPlan.status || 'Planned',
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
+                created_by: newPlan.created_by || undefined,
             };
-            mockAuditPlans.push(plan);
+            (mockAuditPlans as AuditPlan[]).push(plan);
             return getMockData('create-audit-plan', plan) as Promise<AuditPlan>;
         },
         onSuccess: () => {
@@ -108,8 +109,10 @@ export const useUpdateAuditPlan = () => {
         mutationFn: async ({ id, updates }: { id: number; updates: Partial<AuditPlan> }) => {
             const index = mockAuditPlans.findIndex(p => p.id === id);
             if (index === -1) throw new Error('Plan not found');
-            mockAuditPlans[index] = { ...mockAuditPlans[index], ...updates, updated_at: new Date().toISOString() };
-            return getMockData('update-audit-plan', mockAuditPlans[index]) as Promise<AuditPlan>;
+            const existingPlan = mockAuditPlans[index] as AuditPlan;
+            const updatedPlan: AuditPlan = { ...existingPlan, ...updates, updated_at: new Date().toISOString() };
+            (mockAuditPlans as AuditPlan[])[index] = updatedPlan;
+            return getMockData('update-audit-plan', updatedPlan) as Promise<AuditPlan>;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['auditPlans'] });
@@ -126,8 +129,10 @@ export const useUpdateAuditPlanStatus = () => {
         mutationFn: async ({ id, status }: { id: number; status: string }) => {
             const index = mockAuditPlans.findIndex(p => p.id === id);
             if (index === -1) throw new Error('Plan not found');
-            mockAuditPlans[index] = { ...mockAuditPlans[index], status: status as AuditPlan['status'], updated_at: new Date().toISOString() };
-            return getMockData('update-audit-plan-status', mockAuditPlans[index]) as Promise<AuditPlan>;
+            const existingPlan = mockAuditPlans[index] as AuditPlan;
+            const updatedPlan: AuditPlan = { ...existingPlan, status: status as AuditPlan['status'], updated_at: new Date().toISOString() };
+            (mockAuditPlans as AuditPlan[])[index] = updatedPlan;
+            return getMockData('update-audit-plan-status', updatedPlan) as Promise<AuditPlan>;
         },
         onSuccess: () => {
             setTimeout(() => {

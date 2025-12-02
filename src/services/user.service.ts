@@ -194,11 +194,11 @@ export const userService = {
     return getMockData('update-user', { success: true, data: user });
   },
 
-  deleteUser: async (id: number): Promise<ApiResponse<void>> => {
+  deleteUser: async (_id: number): Promise<ApiResponse<void>> => {
     return getMockData('delete-user', { success: true });
   },
 
-  getUserRole: async (userId: number): Promise<ApiResponse<Role>> => {
+  getUserRole: async (_userId: number): Promise<ApiResponse<Role>> => {
     const role: Role = {
       id: 1,
       name: 'team',
@@ -243,7 +243,7 @@ export const userService = {
     return getMockData('create-external-user', { success: true, data: user });
   },
 
-  updateExternalUser: async (id: number, data: Partial<CreateExternalUserData>): Promise<ApiResponse<ExternalUser>> => {
+  updateExternalUser: async (id: number, _data: Partial<CreateExternalUserData>): Promise<ApiResponse<ExternalUser>> => {
     const user: ExternalUser = {
       id,
       email: 'external@example.com',
@@ -255,15 +255,15 @@ export const userService = {
     return getMockData('update-external-user', { success: true, data: user });
   },
 
-  deleteExternalUser: async (id: number): Promise<ApiResponse<void>> => {
+  deleteExternalUser: async (_id: number): Promise<ApiResponse<void>> => {
     return getMockData('delete-external-user', { success: true });
   },
 
-  getExternalUserPermissions: async (userId: number): Promise<ApiResponse<ChartPermission[]>> => {
+  getExternalUserPermissions: async (_userId: number): Promise<ApiResponse<ChartPermission[]>> => {
     return getMockData('external-user-permissions', { success: true, data: [] });
   },
 
-  updateExternalUserPermissions: async (userId: number, permissions: ChartPermission[]): Promise<ApiResponse<void>> => {
+  updateExternalUserPermissions: async (_userId: number, _permissions: ChartPermission[]): Promise<ApiResponse<void>> => {
     return getMockData('update-external-user-permissions', { success: true });
   },
 
@@ -305,7 +305,7 @@ export const userService = {
     return getMockData('update-role', { success: true, data: role });
   },
 
-  deleteRole: async (id: number): Promise<ApiResponse<void>> => {
+  deleteRole: async (_id: number): Promise<ApiResponse<void>> => {
     return getMockData('delete-role', { success: true });
   },
 

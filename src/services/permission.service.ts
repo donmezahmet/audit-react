@@ -34,20 +34,20 @@ export const permissionService = {
   },
 
   // Get permissions for a specific role
-  getRolePermissions: async (roleId: number): Promise<ApiResponse<RoleComponentPermission[]>> => {
+  getRolePermissions: async (_roleId: number): Promise<ApiResponse<RoleComponentPermission[]>> => {
     return getMockData('role-permissions', { success: true, data: [] });
   },
 
   // Update permissions for a role
   updateRolePermissions: async (
-    roleId: number, 
-    data: UpdatePermissionsData
+    _roleId: number, 
+    _data: UpdatePermissionsData
   ): Promise<ApiResponse<void>> => {
     return getMockData('update-role-permissions', { success: true });
   },
 
   // Bulk grant or revoke permissions
-  bulkUpdatePermissions: async (data: BulkPermissionsData): Promise<ApiResponse<void>> => {
+  bulkUpdatePermissions: async (_data: BulkPermissionsData): Promise<ApiResponse<void>> => {
     return getMockData('bulk-update-permissions', { success: true });
   },
 };

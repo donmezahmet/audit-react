@@ -666,6 +666,7 @@ export const mockFindingActions = [
       { email: 'manager4@example.com', name: 'Manager Four' },
     ];
     const manager = managers[managerNum - 1];
+    if (!manager) throw new Error('Manager not found');
     const statuses = ['Open', 'In Progress', 'Closed', 'Overdue', 'Risk Accepted'];
     const riskLevels = ['High', 'Medium', 'Low'];
     const auditYears = ['2024', '2025'];
@@ -1430,10 +1431,11 @@ export const mockDropdownOptions = {
 
 // Mock overdue and upcoming actions
 export const mockOverdueActions = mockFindingActions.filter(a => 
-  a.status === 'Open' && new Date(a.dueDate) < new Date()
+  a.status === 'Open' && a.dueDate && new Date(a.dueDate) < new Date()
 );
 
 export const mockUpcomingActions = mockFindingActions.filter(a => {
+  if (!a.dueDate) return false;
   const dueDate = new Date(a.dueDate);
   const today = new Date();
   const daysDiff = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
@@ -1441,7 +1443,7 @@ export const mockUpcomingActions = mockFindingActions.filter(a => {
 });
 
 // Export helper function
-export const getMockData = async <T>(key: string, data: T, ms: number = 150): Promise<T> => {
+export const getMockData = async <T>(_key: string, data: T, ms: number = 150): Promise<T> => {
   await delay(ms);
   return data;
 };

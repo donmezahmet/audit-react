@@ -112,8 +112,10 @@ export const taskService = {
   updateTask: async (id: number, data: Partial<UpdateTaskData>): Promise<ApiResponse<Task>> => {
     const index = mockTasks.findIndex(t => t.id === id);
     if (index === -1) throw new Error('Task not found');
-    mockTasks[index] = { ...mockTasks[index], ...data, updated_at: new Date().toISOString() };
-    return getMockData('update-task', { success: true, data: mockTasks[index] });
+    const existingTask = mockTasks[index] as Task;
+    const updatedTask: Task = { ...existingTask, ...data, updated_at: new Date().toISOString() } as Task;
+    (mockTasks as any[])[index] = updatedTask;
+    return getMockData('update-task', { success: true, data: updatedTask as any }) as Promise<ApiResponse<Task>>;
   },
 
   // Delete task
@@ -124,7 +126,7 @@ export const taskService = {
   },
 
   // Get task audit log
-  getTaskAuditLog: async (taskId: number): Promise<ApiResponse<TaskAuditLog[]>> => {
+  getTaskAuditLog: async (_taskId: number): Promise<ApiResponse<TaskAuditLog[]>> => {
     return getMockData('task-audit-log', { success: true, data: [] });
   },
 
@@ -137,7 +139,7 @@ export const taskService = {
   },
 
   // Export tasks to Excel
-  exportTasks: async (filters?: TaskFilters): Promise<Blob> => {
+  exportTasks: async (_filters?: TaskFilters): Promise<Blob> => {
     await getMockData('export-tasks', null, 200);
     return new Blob(['Mock export data'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   },

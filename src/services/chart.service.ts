@@ -1,4 +1,4 @@
-import { getMockData, mockChartData } from './mockData.service';
+import { getMockData } from './mockData.service';
 import type { Chart, ChartData, ApiResponse } from '@/types';
 
 export interface ChartFilters {
@@ -14,13 +14,13 @@ export const chartService = {
   },
 
   // Get specific chart data
-  getChartData: async (chartName: string, filters?: ChartFilters): Promise<ApiResponse<ChartData>> => {
-    const data = mockChartData[chartName as keyof typeof mockChartData] || { labels: [], datasets: [] };
+  getChartData: async (_chartName: string, _filters?: ChartFilters): Promise<ApiResponse<ChartData>> => {
+    const data: ChartData = { labels: [], datasets: [] };
     return getMockData('chart-data', { success: true, data });
   },
 
   // Export chart as image
-  exportChart: async (chartName: string, filters?: ChartFilters): Promise<Blob> => {
+  exportChart: async (_chartName: string, _filters?: ChartFilters): Promise<Blob> => {
     await getMockData('export-chart', null, 200);
     return new Blob(['Mock chart image'], { type: 'image/png' });
   },

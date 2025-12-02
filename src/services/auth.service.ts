@@ -1,4 +1,4 @@
-import { getMockData, mockUser, mockPermissions } from './mockData.service';
+import { getMockData, mockPermissions } from './mockData.service';
 import type { ExternalUser, ApiResponse, AuthState } from '@/types';
 
 export interface LoginCredentials {
@@ -84,19 +84,19 @@ export const authService = {
   },
 
   // Request password reset
-  requestPasswordReset: async (email: string): Promise<ApiResponse<void>> => {
+  requestPasswordReset: async (_email: string): Promise<ApiResponse<void>> => {
     await getMockData('requestPasswordReset', null, 150);
     return { success: true };
   },
 
   // Reset password with token
-  resetPassword: async (data: ResetPasswordData): Promise<ApiResponse<void>> => {
+  resetPassword: async (_data: ResetPasswordData): Promise<ApiResponse<void>> => {
     await getMockData('resetPassword', null, 150);
     return { success: true };
   },
 
   // Change password (when logged in)
-  changePassword: async (currentPassword: string, newPassword: string): Promise<ApiResponse<void>> => {
+  changePassword: async (_currentPassword: string, _newPassword: string): Promise<ApiResponse<void>> => {
     await getMockData('changePassword', null, 150);
     return { success: true };
   },

@@ -76,32 +76,34 @@ export const auditFindingService = {
       id: mockAuditFindings.length + 1,
       finding_id: `FND-${String(mockAuditFindings.length + 1).padStart(3, '0')}`,
       finding_name: data.finding_name,
-      finding_description: data.finding_description,
-      audit_type: data.audit_type,
-      audit_type_other: data.audit_type_other,
-      risk_type: data.risk_type,
-      internal_control_element: data.internal_control_element,
-      country: data.country,
-      audit_year: data.audit_year,
+      finding_description: data.finding_description || undefined,
+      audit_type: data.audit_type || undefined,
+      audit_type_other: data.audit_type_other || undefined,
+      risk_type: data.risk_type || undefined,
+      internal_control_element: data.internal_control_element || undefined,
+      country: data.country || undefined,
+      audit_year: data.audit_year || undefined,
       audit_name: data.audit_name,
-      audit_key: data.audit_key,
-      risk_level: data.risk_level,
-      financial_impact: data.financial_impact,
+      audit_key: data.audit_key || undefined,
+      risk_level: data.risk_level || undefined,
+      financial_impact: data.financial_impact || undefined,
       status: data.status || 'Open',
       created_by: 'mahmut@turan.com',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-    mockAuditFindings.push(newFinding);
-    return getMockData('create-audit-finding', { success: true, data: newFinding });
+    (mockAuditFindings as AuditFinding[]).push(newFinding);
+    return getMockData('create-audit-finding', { success: true, data: newFinding as any }) as Promise<ApiResponse<AuditFinding>>;
   },
 
   // Update audit finding
   updateAuditFinding: async (id: number, data: Partial<CreateAuditFindingData>): Promise<ApiResponse<AuditFinding>> => {
     const index = mockAuditFindings.findIndex(f => f.id === id);
     if (index === -1) throw new Error('Finding not found');
-    mockAuditFindings[index] = { ...mockAuditFindings[index], ...data, updated_at: new Date().toISOString() };
-    return getMockData('update-audit-finding', { success: true, data: mockAuditFindings[index] });
+    const existingFinding = mockAuditFindings[index] as AuditFinding;
+    const updatedFinding: AuditFinding = { ...existingFinding, ...data, updated_at: new Date().toISOString() } as AuditFinding;
+    (mockAuditFindings as any[])[index] = updatedFinding;
+    return getMockData('update-audit-finding', { success: true, data: updatedFinding as any }) as Promise<ApiResponse<AuditFinding>>;
   },
 
   // Delete audit finding
@@ -177,7 +179,7 @@ export const auditFindingService = {
   },
 
   // Delete dropdown option (admin only)
-  deleteDropdownOption: async (id: number): Promise<ApiResponse<void>> => {
+  deleteDropdownOption: async (_id: number): Promise<ApiResponse<void>> => {
     return getMockData('delete-dropdown-option', { success: true });
   },
 
@@ -198,12 +200,12 @@ export const auditFindingService = {
   },
 
   // Delete attachment
-  deleteAttachment: async (attachmentId: number): Promise<ApiResponse<void>> => {
+  deleteAttachment: async (_attachmentId: number): Promise<ApiResponse<void>> => {
     return getMockData('delete-attachment', { success: true });
   },
 
   // Finding Actions
-  getFindingActions: async (findingId: number): Promise<FindingAction[]> => {
+  getFindingActions: async (_findingId: number): Promise<FindingAction[]> => {
     return getMockData('finding-actions', []);
   },
 
@@ -267,7 +269,7 @@ export const auditFindingService = {
     return getMockData('update-finding-action', { success: true, data: action });
   },
 
-  deleteFindingAction: async (id: number): Promise<ApiResponse<void>> => {
+  deleteFindingAction: async (_id: number): Promise<ApiResponse<void>> => {
     return getMockData('delete-finding-action', { success: true });
   },
 
@@ -289,22 +291,22 @@ export const auditFindingService = {
   },
 
   // Get user hierarchy (VP and C-Level emails)
-  getUserHierarchy: async (email: string): Promise<{ vp_email: string | null; c_level_email: string | null }> => {
+  getUserHierarchy: async (_email: string): Promise<{ vp_email: string | null; c_level_email: string | null }> => {
     return getMockData('user-hierarchy', { vp_email: 'vp@example.com', c_level_email: 'cfo@example.com' });
   },
 
   // Get finding history
-  getFindingHistory: async (findingId: number): Promise<ApiResponse<any[]>> => {
+  getFindingHistory: async (_findingId: number): Promise<ApiResponse<any[]>> => {
     return getMockData('finding-history', { success: true, data: [] });
   },
 
   // Get action history
-  getActionHistory: async (actionId: number): Promise<ApiResponse<any[]>> => {
+  getActionHistory: async (_actionId: number): Promise<ApiResponse<any[]>> => {
     return getMockData('action-history', { success: true, data: [] });
   },
 
   // Bulk upload findings
-  bulkUploadFindings: async (formData: FormData): Promise<ApiResponse<{ createdCount: number; errors: string[] }>> => {
+  bulkUploadFindings: async (_formData: FormData): Promise<ApiResponse<{ createdCount: number; errors: string[] }>> => {
     return getMockData('bulk-upload-findings', { success: true, data: { createdCount: 5, errors: [] } });
   },
 };
