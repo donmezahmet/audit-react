@@ -53,7 +53,7 @@ const ChartWrapper: React.FC<ChartWrapperProps> = ({
   className,
   loading = false,
   error,
-  padding,
+  padding = 'sm',
 }) => {
   return (
     <Card variant="elevated" padding={padding} className={cn('', className)}>

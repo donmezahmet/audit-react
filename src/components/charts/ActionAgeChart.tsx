@@ -176,25 +176,23 @@ const ActionAgeChart: React.FC<ActionAgeChartProps> = ({
   };
 
   return (
-    <Card variant="elevated">
-      <div className={isMobile ? "p-3" : "p-6"}>
-        <div className={cn("flex items-center justify-between mb-4", isMobile && "mb-2")}>
-          <div>
-            <h3 className={cn("font-semibold text-gray-900", isMobile ? "text-sm" : "text-lg")}>{title}</h3>
-            {subtitle && <p className={cn("text-gray-600 mt-1", isMobile ? "text-xs" : "text-sm")}>{subtitle}</p>}
-          </div>
-          {actions && <div>{actions}</div>}
+    <Card variant="elevated" padding="sm">
+      <div className={cn("flex items-center justify-between mb-4", isMobile && "mb-2")}>
+        <div>
+          <h3 className={cn("font-semibold text-gray-900", isMobile ? "text-sm" : "text-lg")}>{title}</h3>
+          {subtitle && <p className={cn("text-gray-600 mt-1", isMobile ? "text-xs" : "text-sm")}>{subtitle}</p>}
         </div>
+        {actions && <div>{actions}</div>}
+      </div>
 
-        <div style={{ height: `${isMobile ? Math.max(300, (data.labels?.length || 0) * 35) : height}px` }}>
-          {loading ? (
-            <div className="h-full flex items-center justify-center">
-              <Loading size="lg" />
-            </div>
-          ) : (
-            <Bar data={data} options={options} />
-          )}
-        </div>
+      <div style={{ height: `${isMobile ? Math.max(300, (data.labels?.length || 0) * 35) : height}px` }}>
+        {loading ? (
+          <div className="h-full flex items-center justify-center">
+            <Loading size="lg" />
+          </div>
+        ) : (
+          <Bar data={data} options={options} />
+        )}
       </div>
     </Card>
   );

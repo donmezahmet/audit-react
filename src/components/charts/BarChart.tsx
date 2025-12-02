@@ -7,12 +7,14 @@ export interface BarChartProps extends Omit<ChartWrapperProps, 'children'> {
   data: ChartData<'bar'>;
   options?: ChartOptions<'bar'>;
   height?: number;
+  wrapperPadding?: 'none' | 'sm' | 'md' | 'lg';
 }
 
 const BarChart: React.FC<BarChartProps> = ({
   data,
   options,
   height = 300,
+  wrapperPadding,
   ...wrapperProps
 }) => {
   const defaultOptions = getDefaultOptions({
@@ -30,7 +32,7 @@ const BarChart: React.FC<BarChartProps> = ({
   } as ChartOptions<'bar'>;
 
   return (
-    <ChartWrapper {...wrapperProps}>
+    <ChartWrapper {...wrapperProps} padding={wrapperPadding}>
       <div style={{ height: `${height}px` }}>
         <Bar data={data} options={mergedOptions} />
       </div>

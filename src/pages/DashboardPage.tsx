@@ -316,30 +316,41 @@ const DashboardPage: React.FC = () => {
     }
 
     const statusDist = actionStatus.statusDistribution as Record<string, number>;
-    const labels = Object.keys(statusDist);
-    const data = Object.values(statusDist);
+    
+    // Map "Closed" and "In Progress" to "Completed" to match exe-dash (no gray colors)
+    const normalizedStatusDist: Record<string, number> = {};
+    Object.entries(statusDist).forEach(([status, count]) => {
+      const normalizedStatus = 
+        status === 'Closed' || status === 'In Progress' 
+          ? 'Completed' 
+          : status;
+      normalizedStatusDist[normalizedStatus] = (normalizedStatusDist[normalizedStatus] || 0) + count;
+    });
+    
+    const labels = Object.keys(normalizedStatusDist);
+    const data = Object.values(normalizedStatusDist);
 
-    // Use STATUS_COLORS from status.utils.ts for consistency
+    // Updated colors to match exe-dash design - birebir aynı (no gray colors)
     const backgroundColors = {
-      'Open': STATUS_COLORS['Open'] || 'rgba(59, 130, 246, 0.8)',
-      'Risk Accepted': STATUS_COLORS['Risk Accepted'] || 'rgba(147, 51, 234, 0.8)',
-      'Completed': STATUS_COLORS['Completed'] || 'rgba(34, 197, 94, 0.8)',
-      'Overdue': STATUS_COLORS['Overdue'] || 'rgba(239, 68, 68, 0.8)',
+      'Open': 'rgba(59, 130, 246, 0.8)',        // Blue
+      'Risk Accepted': 'rgba(147, 51, 234, 0.8)', // Purple
+      'Completed': 'rgba(34, 197, 94, 0.8)',    // Green
+      'Overdue': 'rgba(239, 68, 68, 0.8)',      // Red
     };
 
     const borderColors = {
-      'Open': STATUS_COLORS['Open']?.replace('0.8', '1') || 'rgba(59, 130, 246, 1)',
-      'Risk Accepted': STATUS_COLORS['Risk Accepted']?.replace('0.8', '1') || 'rgba(147, 51, 234, 1)',
-      'Completed': STATUS_COLORS['Completed']?.replace('0.8', '1') || 'rgba(34, 197, 94, 1)',
-      'Overdue': STATUS_COLORS['Overdue']?.replace('0.8', '1') || 'rgba(239, 68, 68, 1)',
+      'Open': 'rgba(59, 130, 246, 1)',        // Blue
+      'Risk Accepted': 'rgba(147, 51, 234, 1)', // Purple
+      'Completed': 'rgba(34, 197, 94, 1)',    // Green
+      'Overdue': 'rgba(239, 68, 68, 1)',      // Red
     };
 
     return {
       labels,
       datasets: [{
         data,
-        backgroundColor: labels.map(l => backgroundColors[l as keyof typeof backgroundColors] || 'rgba(156, 163, 175, 0.8)'),
-        borderColor: labels.map(l => borderColors[l as keyof typeof borderColors] || 'rgba(156, 163, 175, 1)'),
+        backgroundColor: labels.map(l => backgroundColors[l as keyof typeof backgroundColors] || 'rgba(34, 197, 94, 0.8)'), // Default to green (Completed) instead of gray
+        borderColor: labels.map(l => borderColors[l as keyof typeof borderColors] || 'rgba(34, 197, 94, 1)'), // Default to green (Completed) instead of gray
         borderWidth: 2,
       }],
     };
@@ -352,15 +363,34 @@ const DashboardPage: React.FC = () => {
     }
 
     const leadStatusMap = leadStatusData as Record<string, Record<string, number>>;
-    const leads = Object.keys(leadStatusMap).filter(lead => lead !== 'Unassigned').slice(0, 10); // Top 10 leads
+    
+    // Normalize "Closed" and "In Progress" to "Completed" to match exe-dash (no gray colors)
+    const normalizedLeadStatusMap: Record<string, Record<string, number>> = {};
+    Object.entries(leadStatusMap).forEach(([lead, statusCounts]) => {
+      if (!statusCounts) return;
+      normalizedLeadStatusMap[lead] = {};
+      Object.entries(statusCounts).forEach(([status, count]) => {
+        const normalizedStatus = 
+          status === 'Closed' || status === 'In Progress' 
+            ? 'Completed' 
+            : status;
+        const currentLeadData = normalizedLeadStatusMap[lead];
+        if (currentLeadData) {
+          currentLeadData[normalizedStatus] = 
+            (currentLeadData[normalizedStatus] || 0) + count;
+        }
+      });
+    });
+    
+    const leads = Object.keys(normalizedLeadStatusMap).filter(lead => lead !== 'Unassigned').slice(0, 10); // Top 10 leads
     const statuses = ['Open', 'Risk Accepted', 'Completed', 'Overdue'];
 
-    // Use STATUS_COLORS from status.utils.ts for consistency
+    // Updated colors to match exe-dash design - birebir aynı (no gray colors)
     const colors = {
-      'Open': STATUS_COLORS['Open']?.replace('0.8', '0.9') || 'rgba(59, 130, 246, 0.9)',
-      'Risk Accepted': STATUS_COLORS['Risk Accepted']?.replace('0.8', '0.9') || 'rgba(147, 51, 234, 0.9)',
-      'Completed': STATUS_COLORS['Completed']?.replace('0.8', '0.9') || 'rgba(34, 197, 94, 0.9)',
-      'Overdue': STATUS_COLORS['Overdue']?.replace('0.8', '0.9') || 'rgba(239, 68, 68, 0.9)',
+      'Open': 'rgba(59, 130, 246, 0.9)',        // Blue
+      'Risk Accepted': 'rgba(147, 51, 234, 0.9)', // Purple
+      'Completed': 'rgba(34, 197, 94, 0.9)',    // Green
+      'Overdue': 'rgba(239, 68, 68, 0.9)',      // Red (matching pie chart)
     };
 
     return {
@@ -368,10 +398,11 @@ const DashboardPage: React.FC = () => {
       datasets: statuses.map(status => ({
         label: status,
         data: leads.map(lead => {
-          const leadData = leadStatusMap[lead];
-          return leadData ? (leadData[status] || 0) : 0;
+          const leadData = normalizedLeadStatusMap[lead];
+          if (!leadData) return 0;
+          return leadData[status] || 0;
         }),
-        backgroundColor: colors[status as keyof typeof colors] || 'rgba(156, 163, 175, 0.9)',
+        backgroundColor: colors[status as keyof typeof colors] || 'rgba(34, 197, 94, 0.9)', // Default to green (Completed) instead of gray
         barPercentage: 0.7,
         categoryPercentage: 0.8,
       })),
@@ -2786,7 +2817,7 @@ const DashboardPage: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <PermissionGate component="finding_distribution_risk_chart">
-              <Card variant="elevated">
+              <Card variant="elevated" padding="sm">
                 <CardHeader
                   title="Finding Distribution by Risk Type and Risk Level"
                 >
@@ -2955,7 +2986,7 @@ const DashboardPage: React.FC = () => {
           {/* Google Sheets Tables - Fraud & Loss Prevention */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <PermissionGate component="finding_distribution_risk_chart">
-              <Card variant="elevated">
+              <Card variant="elevated" padding="sm">
                 <CardHeader
                   title="Fraud Internal Control"
                   subtitle="Data from Google Sheets"
@@ -3241,7 +3272,7 @@ const DashboardPage: React.FC = () => {
           {/* Charts Section - Permission Based with Real Data */}
           <div ref={allChartsSectionRef} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <PermissionGate component="finding_actions_status_chart">
-              <Card>
+              <Card padding="sm">
                 <CardHeader>
                   <div>
                     <h2 className={cn(
@@ -3265,11 +3296,11 @@ const DashboardPage: React.FC = () => {
                     </div>
                   </div>
                 </CardHeader>
-                <div className={cn("p-6", isMobileViewport && "flex flex-col items-center")}>
+                <div className={cn("p-4", isMobileViewport && "flex flex-col items-center")}>
                   <div className={cn("w-full", isMobileViewport ? "max-w-[360px]" : "")}>
                     <PieChart
                       data={findingActionsData}
-                      height={isMobileViewport ? 320 : 360}
+                      height={isMobileViewport ? 280 : 300}
                       loading={loadingActionStatus}
                       options={{
                         onClick: (_event, elements) => {
@@ -3350,7 +3381,7 @@ const DashboardPage: React.FC = () => {
             </PermissionGate>
 
             <PermissionGate component="finding_actions_by_lead_chart">
-              <Card>
+              <Card padding="sm">
                 <CardHeader>
                   <div>
                     <h2 className={cn(
@@ -3374,7 +3405,7 @@ const DashboardPage: React.FC = () => {
                     </div>
                   </div>
                 </CardHeader>
-                <div className="p-6">
+                <div className="p-4">
                   {isMobileViewport ? (
                     <div className="flex flex-col gap-3">
                       {(() => {
@@ -3441,7 +3472,7 @@ const DashboardPage: React.FC = () => {
                   ) : (
                     <BarChart
                       data={findingActionsByLeadData}
-                      height={400}
+                      height={350}
                       loading={loadingLeadStatus}
                       options={{
                         indexAxis: 'y',
@@ -3547,7 +3578,7 @@ const DashboardPage: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* NEW: Actions/Findings Breakdown by Audit & Risk Level */}
-            <Card>
+            <Card padding="sm">
               <CardHeader className="relative">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 w-full">
                   <div>
@@ -3598,7 +3629,7 @@ const DashboardPage: React.FC = () => {
                   </div>
                 </div>
               </CardHeader>
-              <div className="p-6">
+              <div className="p-4">
                 <ActionsByAuditRiskTable
                   data={breakdownMode === 'actions' ? (actionsByAuditRisk || []) : (findingsByAuditRisk || [])}
                   isLoading={breakdownMode === 'actions' ? loadingAuditRisk : loadingFindingsRisk}
@@ -3614,21 +3645,22 @@ const DashboardPage: React.FC = () => {
                 data={findingByYearData}
                 height={400}
                 loading={loadingFindingStatus}
+                wrapperPadding="sm"
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: {
                     legend: {
                       display: true,
-                      position: 'top',
-                      align: 'end',
+                      position: 'bottom',
+                      align: 'center',
                       labels: {
-                        padding: 15,
+                        padding: 20,
                         usePointStyle: true,
                         pointStyle: 'circle',
                         font: {
                           size: 12,
-                          weight: 'bold',
+                          weight: 'normal',
                         },
                         color: '#374151',
                       },
@@ -3647,7 +3679,7 @@ const DashboardPage: React.FC = () => {
                       borderWidth: 1,
                       displayColors: true,
                       callbacks: {
-                        label: (context) => {
+                        label: (context: any) => {
                           const label = context.dataset.label || '';
                           const value = context.parsed.y || 0;
                           return `${label}: ${value} findings`;
@@ -3701,7 +3733,13 @@ const DashboardPage: React.FC = () => {
                     duration: 750,
                     easing: 'easeInOutQuart',
                   },
-                }}
+                  datasets: {
+                    bar: {
+                      barPercentage: 0.6,
+                      categoryPercentage: 0.8,
+                    },
+                  },
+                } as any}
               />
             </PermissionGate>
           </div>
@@ -3730,6 +3768,7 @@ const DashboardPage: React.FC = () => {
                     data={radarData}
                     height={400}
                     loading={loadingRadar}
+                    wrapperPadding="sm"
                     labelColors={
                       radarChartData?.labelsWithGroups
                         ? radarChartData.labelsWithGroups.map((item: { dimension: string; group: string; fullLabel: string }) => {
@@ -3792,65 +3831,7 @@ const DashboardPage: React.FC = () => {
                             z: 1,
                           },
                           pointLabels: {
-                            display: true,
-                            font: {
-                              size: 8.5,
-                              weight: 600,
-                            },
-                            color: (context: any) => {
-                              const groupColors: Record<string, string> = {
-                                'Governance': '#1f2937',
-                                'Use of Technology': '#8b5cf6',
-                                'People': '#10b981',
-                                'Communications': '#3b82f6',
-                                'Scope of Work': '#f59e0b',
-                              };
-                              if (radarChartData?.labelsWithGroups?.[context.index]) {
-                                const group = radarChartData.labelsWithGroups[context.index].group;
-                                return groupColors[group] || '#374151';
-                              }
-                              return '#374151';
-                            },
-                            padding: 1,
-                            callback: (label: string | undefined, context: any) => {
-                              if (!label) return '';
-                              const abbreviations: Record<string, string> = {
-                                'Functional Reporting & Positioning (Governance)': 'Functional Reporting',
-                                'Resource': 'Resource',
-                                'Use of Technology': 'Technology',
-                                'Overall Opinions': 'Overall Opinions',
-                                'Audit Methodology & Reporting (Communications)': 'Methodology',
-                                'Planning (Scope of Work)': 'Planning',
-                                'Assurance (Scope of Work)': 'Assurance',
-                                'Risk Assessment (Scope of Work)': 'Risk Assessment',
-                              };
-                              let dimensionName = '';
-                              if (abbreviations[label]) {
-                                dimensionName = abbreviations[label];
-                              } else {
-                                dimensionName = label.split(' (')[0] || label;
-                                if (dimensionName.length > 15) {
-                                  dimensionName = dimensionName.substring(0, 12) + '...';
-                                }
-                              }
-
-                              // Get group name
-                              let groupName = '';
-                              if (radarChartData?.labelsWithGroups?.[context.index]) {
-                                groupName = radarChartData.labelsWithGroups[context.index].group;
-                                // Shorten group names for mobile
-                                const groupShortNames: Record<string, string> = {
-                                  'Governance': 'Gov',
-                                  'Use of Technology': 'Tech',
-                                  'People': 'People',
-                                  'Communications': 'Comm',
-                                  'Scope of Work': 'Scope',
-                                };
-                                groupName = groupShortNames[groupName] || groupName;
-                              }
-
-                              return groupName ? `${dimensionName}\n${groupName}` : dimensionName;
-                            },
+                            display: false, // Hide labels on chart, show only in tooltip
                           },
                         },
                       },
@@ -3933,6 +3914,7 @@ const DashboardPage: React.FC = () => {
                   data={radarData}
                   height={450}
                   loading={loadingRadar}
+                  wrapperPadding="sm"
                   labelColors={
                     radarChartData?.labelsWithGroups
                       ? radarChartData.labelsWithGroups.map((item: { dimension: string; group: string; fullLabel: string }) => {
@@ -4001,79 +3983,7 @@ const DashboardPage: React.FC = () => {
                           z: 10,
                         },
                         pointLabels: {
-                          display: true,
-                          font: {
-                            size: 11,
-                            weight: 700,
-                          },
-                          color: (context: any) => {
-                            const groupColors: Record<string, string> = {
-                              'Governance': '#1f2937',
-                              'Use of Technology': '#8b5cf6',
-                              'People': '#10b981',
-                              'Communications': '#3b82f6',
-                              'Scope of Work': '#d97706',
-                            };
-                            if (radarChartData?.labelsWithGroups?.[context.index]) {
-                              const group = radarChartData.labelsWithGroups[context.index].group;
-                              return groupColors[group] || '#374151';
-                            }
-                            return '#374151';
-                          },
-                          padding: 12,
-                          callback: (label: string | undefined, context: any) => {
-                            if (!label) return '';
-
-                            // Label is already in fullLabel format like "Functional Reporting & Positioning (Governance)"
-                            // Extract dimension name and group
-                            const parts = label.split(' (');
-                            let dimensionName: string = (parts[0] ?? label) as string;
-                            let groupName = '';
-
-                            // Extract group from parentheses if present
-                            if (parts.length > 1 && parts[1]) {
-                              groupName = parts[1].replace(')', '').trim();
-                            }
-
-                            // If no group in label, try to get from labelsWithGroups
-                            if (!groupName && radarChartData?.labelsWithGroups && context.index !== undefined) {
-                              const groupInfo = radarChartData.labelsWithGroups[context.index];
-                              if (groupInfo && groupInfo.group) {
-                                groupName = groupInfo.group;
-                              }
-                            }
-
-                            // Abbreviate long labels
-                            const abbreviations: Record<string, string> = {
-                              'Functional Reporting & Positioning': 'Functional Reporting',
-                              'Resource': 'Resources',
-                              'Use of Technology': 'Technology',
-                              'Overall Opinions': 'Overall Opinions',
-                              'Audit Methodology & Reporting': 'Methodology',
-                              'Planning': 'Planning',
-                              'Assurance': 'Assurance',
-                              'Risk Assessment': 'Risk Assessment',
-                            };
-
-                            if (dimensionName) {
-                              const abbrev = abbreviations[dimensionName];
-                              if (abbrev) {
-                                dimensionName = abbrev;
-                              } else if (dimensionName.length > 18) {
-                                dimensionName = dimensionName.substring(0, 15) + '...';
-                              }
-                            } else {
-                              return '';
-                            }
-
-                            // Return 2-line label: dimension name on top, group name on bottom
-                            if (groupName) {
-                              // Return array for proper multi-line display
-                              return [dimensionName, `(${groupName})`];
-                            }
-
-                            return dimensionName;
-                          },
+                          display: false, // Hide labels on chart, show only in tooltip
                         },
                       },
                     },
@@ -4155,7 +4065,7 @@ const DashboardPage: React.FC = () => {
                             if (!context || context.parsed.r === null || context.parsed.r === undefined) return '';
                             const year = context.dataset.label || '';
                             const value = context.parsed.r || 0;
-                            return `${year}: ${value.toFixed(1)}`;
+                            return `${year}: ${value.toFixed(1)} / 5`;
                           },
                           labelColor: (context: any) => {
                             return {
@@ -4198,7 +4108,7 @@ const DashboardPage: React.FC = () => {
             {/* Finding Distribution by Risk Type */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <PermissionGate component="finding_distribution_risk_chart">
-                <Card variant="elevated">
+                <Card variant="elevated" padding="sm">
                   <CardHeader
                     title="Finding Distribution by Risk Type and Risk Level"
                   >

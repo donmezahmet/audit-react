@@ -1,4 +1,5 @@
 import { getMockData, mockPermissions } from './mockData.service';
+import { userService } from './user.service';
 import type { ExternalUser, ApiResponse, AuthState } from '@/types';
 
 export interface LoginCredentials {
@@ -18,6 +19,25 @@ const HARDCODED_PASSWORD = 'mahmutturan12345';
 export const authService = {
   // Get current user
   getCurrentUser: async (): Promise<any> => {
+    // Check if impersonating - if so, return impersonated user
+    const impersonatedUserStr = localStorage.getItem('impersonated_user');
+    const originalUserStr = localStorage.getItem('mock_user');
+    
+    if (impersonatedUserStr) {
+      const impersonatedUser = JSON.parse(impersonatedUserStr);
+      const originalUser = originalUserStr ? JSON.parse(originalUserStr) : null;
+      
+      return {
+        success: true,
+        authenticated: true,
+        user: impersonatedUser,
+        role: impersonatedUser.role,
+        permissions: mockPermissions,
+        isImpersonating: true,
+        originalUser: originalUser,
+      };
+    }
+    
     // Check if user is stored in localStorage (simulating session)
     const storedUser = localStorage.getItem('mock_user');
     if (storedUser) {
@@ -28,6 +48,8 @@ export const authService = {
         user,
         role: user.role,
         permissions: mockPermissions,
+        isImpersonating: false,
+        originalUser: null,
       };
     }
     return {
@@ -36,6 +58,8 @@ export const authService = {
       user: null,
       role: undefined,
       permissions: undefined,
+      isImpersonating: false,
+      originalUser: null,
     };
   },
 
@@ -74,6 +98,7 @@ export const authService = {
   logout: async (): Promise<ApiResponse<void>> => {
     await getMockData('logout', null, 100);
     localStorage.removeItem('mock_user');
+    localStorage.removeItem('impersonated_user');
     return { success: true };
   },
 
@@ -122,15 +147,56 @@ export const authService = {
   // View as user (admin impersonation)
   viewAsUser: async (targetEmail: string): Promise<ApiResponse<any>> => {
     await getMockData('viewAsUser', null, 150);
+    
+    // Get the target user from userService
+    const usersResponse = await userService.getAccessManagementUsers();
+    
+    if (usersResponse.success && usersResponse.data) {
+      const targetUser = usersResponse.data.find(u => u.email === targetEmail);
+      
+      if (targetUser) {
+        // Store original user if not already stored
+        const originalUserStr = localStorage.getItem('mock_user');
+        if (!originalUserStr) {
+          // This shouldn't happen, but just in case
+          return {
+            success: false,
+            error: 'No original user found',
+          };
+        }
+        
+        // Convert User to ExternalUser format for impersonated user
+        const impersonatedUser: ExternalUser = {
+          id: targetUser.id,
+          email: targetUser.email,
+          name: targetUser.name,
+          role: targetUser.role,
+          is_active: targetUser.status === 'active',
+          must_reset_password: false,
+          created_at: targetUser.created_at,
+        };
+        
+        // Store impersonated user in localStorage
+        localStorage.setItem('impersonated_user', JSON.stringify(impersonatedUser));
+        
+        return {
+          success: true,
+          data: { email: targetEmail, user: impersonatedUser },
+        };
+      }
+    }
+    
     return {
-      success: true,
-      data: { email: targetEmail },
+      success: false,
+      error: 'Target user not found',
     };
   },
 
   // Stop impersonation
   stopImpersonation: async (): Promise<ApiResponse<void>> => {
     await getMockData('stopImpersonation', null, 100);
+    // Remove impersonated user from localStorage
+    localStorage.removeItem('impersonated_user');
     return { success: true };
   },
 };

@@ -105,22 +105,214 @@ export const jiraService = {
     }
   },
 
-  getActionsByAuditAndRisk: async (_auditYear?: string): Promise<any> => {
-    return getMockData('actions-by-audit-and-risk', mockChartData['actions-by-audit-and-risk']);
+  getActionsByAuditAndRisk: async (auditYear?: string): Promise<any> => {
+    // Generate mock data from annual audit plans
+    const { mockAuditPlans } = await import('./mockData.service');
+    
+    // Filter by year if provided
+    let filteredPlans = mockAuditPlans;
+    if (auditYear && auditYear !== 'all' && auditYear !== '2024+') {
+      filteredPlans = filteredPlans.filter(p => p.audit_year.toString() === auditYear);
+    } else if (auditYear === '2024+') {
+      filteredPlans = filteredPlans.filter(p => p.audit_year >= 2024);
+    }
+    
+    // Generate mock data for each audit
+    const mockData = filteredPlans.map((plan) => {
+      // Generate random counts for each risk level
+      const critical = Math.floor(Math.random() * 5) + 1; // 1-5
+      const high = Math.floor(Math.random() * 10) + 5; // 5-14
+      const medium = Math.floor(Math.random() * 15) + 10; // 10-24
+      const low = Math.floor(Math.random() * 8) + 3; // 3-10
+      const total = critical + high + medium + low;
+      
+      // Calculate completion rates (random between 20-80%)
+      const criticalCompleted = Math.floor(critical * (0.2 + Math.random() * 0.6));
+      const highCompleted = Math.floor(high * (0.2 + Math.random() * 0.6));
+      const mediumCompleted = Math.floor(medium * (0.2 + Math.random() * 0.6));
+      const lowCompleted = Math.floor(low * (0.2 + Math.random() * 0.6));
+      const totalCompleted = criticalCompleted + highCompleted + mediumCompleted + lowCompleted;
+      const completionRate = total > 0 ? (totalCompleted / total) * 100 : 0;
+      
+      return {
+        auditYear: plan.audit_year.toString(),
+        auditName: plan.audit_name,
+        total,
+        completed: totalCompleted,
+        completionRate: Math.round(completionRate * 10) / 10,
+        riskBreakdown: {
+          Critical: { total: critical, completed: criticalCompleted },
+          High: { total: high, completed: highCompleted },
+          Medium: { total: medium, completed: mediumCompleted },
+          Low: { total: low, completed: lowCompleted },
+        },
+      };
+    });
+    
+    return getMockData('actions-by-audit-and-risk', mockData);
   },
 
   getActionsByAuditRiskDetail: async (auditYear: string, auditName: string, riskLevel?: string): Promise<any> => {
-    return getMockData('actions-by-audit-risk-detail', mockFindingActions.filter(a => 
-      a.auditYear === auditYear && a.auditName === auditName && (!riskLevel || a.riskLevel === riskLevel)
-    ));
+    // Import mockAuditPlans to get audit lead information
+    const { mockAuditPlans } = await import('./mockData.service');
+    
+    // Filter actions by audit year, audit name (with flexible matching), and risk level
+    const filtered = mockFindingActions.filter(a => {
+      // Check audit year
+      if (a.auditYear !== auditYear) return false;
+      
+      // Check audit name - use flexible matching
+      // Remove year from both names for comparison (e.g., "Financial Audit Q1 2025" vs "Financial Audit Q1 2024")
+      const normalizeName = (name: string) => {
+        return name.replace(/\s+\d{4}$/, '').trim(); // Remove trailing year
+      };
+      
+      const normalizedActionName = normalizeName(a.auditName || '');
+      const normalizedRequestName = normalizeName(auditName);
+      
+      const auditNameMatch = a.auditName && (
+        a.auditName === auditName || 
+        normalizedActionName === normalizedRequestName ||
+        a.auditName.includes(normalizedRequestName) || 
+        normalizedRequestName.includes(normalizedActionName)
+      );
+      if (!auditNameMatch) return false;
+      
+      // Check risk level if provided
+      if (riskLevel && a.riskLevel !== riskLevel) return false;
+      
+      return true;
+    });
+    
+    // Transform actions to include auditLead from mockAuditPlans
+    const transformed = filtered.map(a => {
+      // Find matching audit plan to get audit lead
+      const auditPlan = mockAuditPlans.find(p => 
+        p.audit_year.toString() === a.auditYear && 
+        (p.audit_name === a.auditName || 
+         p.audit_name.includes(a.auditName) || 
+         a.auditName.includes(p.audit_name))
+      );
+      
+      return {
+        ...a,
+        auditLead: auditPlan?.audit_lead_name || '',
+      };
+    });
+    
+    return getMockData('actions-by-audit-risk-detail', transformed);
   },
 
-  getFindingsByAuditAndRisk: async (_auditYear?: string): Promise<any> => {
-    return getMockData('findings-by-audit-and-risk', mockChartData['findings-by-audit-and-risk']);
+  getFindingsByAuditAndRisk: async (auditYear?: string): Promise<any> => {
+    // Generate mock data from annual audit plans
+    const { mockAuditPlans } = await import('./mockData.service');
+    
+    // Filter by year if provided
+    let filteredPlans = mockAuditPlans;
+    if (auditYear && auditYear !== 'all' && auditYear !== '2024+') {
+      filteredPlans = filteredPlans.filter(p => p.audit_year.toString() === auditYear);
+    } else if (auditYear === '2024+') {
+      filteredPlans = filteredPlans.filter(p => p.audit_year >= 2024);
+    }
+    
+    // Generate mock data for each audit
+    const mockData = filteredPlans.map((plan) => {
+      // Generate random counts for each risk level (findings typically have fewer than actions)
+      const critical = Math.floor(Math.random() * 3) + 1; // 1-3
+      const high = Math.floor(Math.random() * 8) + 3; // 3-10
+      const medium = Math.floor(Math.random() * 12) + 5; // 5-16
+      const low = Math.floor(Math.random() * 6) + 2; // 2-7
+      const total = critical + high + medium + low;
+      
+      // Calculate completion rates (random between 30-90% for findings)
+      const criticalCompleted = Math.floor(critical * (0.3 + Math.random() * 0.6));
+      const highCompleted = Math.floor(high * (0.3 + Math.random() * 0.6));
+      const mediumCompleted = Math.floor(medium * (0.3 + Math.random() * 0.6));
+      const lowCompleted = Math.floor(low * (0.3 + Math.random() * 0.6));
+      const totalCompleted = criticalCompleted + highCompleted + mediumCompleted + lowCompleted;
+      const completionRate = total > 0 ? (totalCompleted / total) * 100 : 0;
+      
+      return {
+        auditYear: plan.audit_year.toString(),
+        auditName: plan.audit_name,
+        total,
+        completed: totalCompleted,
+        completionRate: Math.round(completionRate * 10) / 10,
+        riskBreakdown: {
+          Critical: { total: critical, completed: criticalCompleted },
+          High: { total: high, completed: highCompleted },
+          Medium: { total: medium, completed: mediumCompleted },
+          Low: { total: low, completed: lowCompleted },
+        },
+      };
+    });
+    
+    return getMockData('findings-by-audit-and-risk', mockData);
   },
 
-  getFindingsByAuditRiskDetail: async (_auditYear: string, _auditName: string, _riskLevel?: string): Promise<any> => {
-    return getMockData('findings-by-audit-risk-detail', []);
+  getFindingsByAuditRiskDetail: async (auditYear: string, auditName: string, riskLevel?: string): Promise<any> => {
+    // Import mockAuditFindings and mockAuditPlans
+    const { mockAuditFindings, mockAuditPlans } = await import('./mockData.service');
+    
+    // Filter findings by audit year, audit name (with flexible matching), and risk level
+    const filtered = mockAuditFindings.filter(f => {
+      // Check audit year
+      if (f.audit_year !== auditYear) return false;
+      
+      // Check audit name - use flexible matching
+      const normalizeName = (name: string) => {
+        return name.replace(/\s+\d{4}$/, '').trim(); // Remove trailing year
+      };
+      
+      const normalizedFindingName = normalizeName(f.audit_name || '');
+      const normalizedRequestName = normalizeName(auditName);
+      
+      const auditNameMatch = f.audit_name && (
+        f.audit_name === auditName || 
+        normalizedFindingName === normalizedRequestName ||
+        f.audit_name.includes(normalizedRequestName) || 
+        normalizedRequestName.includes(normalizedFindingName)
+      );
+      if (!auditNameMatch) return false;
+      
+      // Check risk level if provided
+      if (riskLevel && f.risk_level !== riskLevel) return false;
+      
+      return true;
+    });
+    
+    // Transform findings to match ActionsListModal expected format
+    const transformed = filtered.map(f => {
+      // Find matching audit plan to get audit lead
+      const auditPlan = mockAuditPlans.find(p => 
+        p.audit_year.toString() === f.audit_year && 
+        (p.audit_name === f.audit_name || 
+         p.audit_name.includes(f.audit_name) || 
+         f.audit_name.includes(p.audit_name))
+      );
+      
+      return {
+        key: f.finding_id || `FND-${f.id}`,
+        summary: f.finding_name || '',
+        description: f.finding_description || '',
+        status: f.status || 'Open',
+        displayStatus: f.status || 'Open',
+        auditName: f.audit_name || '',
+        auditYear: f.audit_year || '',
+        auditLead: auditPlan?.audit_lead_name || '',
+        riskLevel: f.risk_level || 'Unassigned',
+        finding_id: f.finding_id,
+        finding_name: f.finding_name,
+        finding_description: f.finding_description,
+        audit_type: f.audit_type,
+        risk_type: f.risk_type,
+        financial_impact: f.financial_impact,
+        country: f.country,
+        internal_control_element: f.internal_control_element,
+      };
+    });
+    
+    return getMockData('findings-by-audit-risk-detail', transformed);
   },
 
   getFindingActionsByLead: async (): Promise<any> => {
@@ -286,20 +478,26 @@ export const jiraService = {
   },
 
   getRadarChartData: async (): Promise<any> => {
-    // Return format: { labels: [...], datasets: [...] }
+    // Return format: { labels: [...], labelsWithGroups: [...], data2024: [...], data2025: [...] }
     return getMockData('radar-chart-data', {
       labels: ['Governance', 'Risk Management', 'Control Environment', 'Monitoring', 'Communication'],
-      datasets: [{
-        label: '2024',
-        data: [4.2, 3.9, 3.7, 3.6, 4.0],
-        borderColor: 'rgba(99, 102, 241, 1)',
-        backgroundColor: 'rgba(99, 102, 241, 0.2)',
-      }, {
-        label: '2025',
-        data: [4.4, 4.2, 4.0, 3.9, 4.2],
-        borderColor: 'rgba(34, 197, 94, 1)',
-        backgroundColor: 'rgba(34, 197, 94, 0.2)',
-      }],
+      labelsWithGroups: [
+        { dimension: 'Governance Structure', group: 'Governance', fullLabel: 'Governance Structure' },
+        { dimension: 'Board Oversight', group: 'Governance', fullLabel: 'Board Oversight' },
+        { dimension: 'Risk Assessment Process', group: 'Use of Technology', fullLabel: 'Risk Assessment Process' },
+        { dimension: 'Data Analytics', group: 'Use of Technology', fullLabel: 'Data Analytics' },
+        { dimension: 'Audit Software', group: 'Use of Technology', fullLabel: 'Audit Software' },
+        { dimension: 'Team Skills', group: 'People', fullLabel: 'Team Skills' },
+        { dimension: 'Training Programs', group: 'People', fullLabel: 'Training Programs' },
+        { dimension: 'Stakeholder Communication', group: 'Communications', fullLabel: 'Stakeholder Communication' },
+        { dimension: 'Report Quality', group: 'Communications', fullLabel: 'Report Quality' },
+        { dimension: 'Audit Coverage', group: 'Scope of Work', fullLabel: 'Audit Coverage' },
+        { dimension: 'Audit Depth', group: 'Scope of Work', fullLabel: 'Audit Depth' },
+      ],
+      // 2024 values - lower baseline
+      data2024: [3.2, 3.5, 2.8, 3.1, 2.9, 3.4, 2.6, 3.3, 2.7, 3.0, 2.8],
+      // 2025 values - significantly improved, more varied
+      data2025: [4.5, 4.2, 4.1, 4.6, 4.3, 4.4, 3.8, 4.7, 4.2, 4.5, 4.0],
     });
   },
 
@@ -470,9 +668,27 @@ export const jiraService = {
 
   // Get detailed actions by status (for modal)
   getActionsByStatus: async (status: string, auditYear?: string): Promise<any[]> => {
-    let filtered = mockFindingActions.filter(a => a.status === status);
+    // Handle "Completed" status - it's a normalized status that combines "Closed" and "In Progress"
+    let statusesToFilter: string[] = [status];
+    if (status === 'Completed') {
+      statusesToFilter = ['Closed', 'In Progress'];
+    }
+    
+    let filtered = mockFindingActions.filter(a => statusesToFilter.includes(a.status));
     if (auditYear) {
-      filtered = filtered.filter(a => a.auditYear === auditYear);
+      if (auditYear === '2024+') {
+        // Filter for years >= 2024
+        filtered = filtered.filter(a => {
+          const year = parseInt(a.auditYear || '0', 10);
+          return year >= 2024;
+        });
+      } else if (auditYear === 'all') {
+        // Don't filter by year, return all
+        // filtered already contains all matching status
+      } else {
+        // Filter by exact year
+        filtered = filtered.filter(a => a.auditYear === auditYear);
+      }
     }
     return getMockData('actions-by-status', filtered);
   },

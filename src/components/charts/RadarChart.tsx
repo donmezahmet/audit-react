@@ -56,6 +56,13 @@ const RadarChart: React.FC<RadarChartProps> = ({
         },
         borderColor: 'rgba(255, 255, 255, 0.1)',
         borderWidth: 1,
+        callbacks: {
+          label: (context: any) => {
+            const label = context.label || '';
+            const value = context.parsed.r || 0;
+            return `${label}: ${value.toFixed(1)} / 5`;
+          },
+        },
       },
     },
     scales: {

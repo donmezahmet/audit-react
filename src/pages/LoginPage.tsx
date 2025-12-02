@@ -5,7 +5,7 @@ import { Button, Input } from '@/components/ui';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login, checkAuth } = useAuthStore();
+  const { login } = useAuthStore();
   const [showExternalModal, setShowExternalModal] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,21 +20,17 @@ const LoginPage: React.FC = () => {
     try {
       const success = await login(email, password);
       if (success) {
-        // Wait a bit to ensure Zustand persist middleware has saved to localStorage
-        await new Promise(resolve => setTimeout(resolve, 150));
-        
-        // Re-check auth to ensure state is properly synchronized
-        await checkAuth();
-        
-        // Verify authentication state is set
+        // Get the role before navigation
         const authState = useAuthStore.getState();
-        if (authState.isAuthenticated && authState.user) {
-          const currentRole = authState.role;
-          navigate(currentRole === 'team' ? '/my-actions' : '/');
-        } else {
-          setError('Login failed. Please try again.');
-          setIsLoading(false);
-        }
+        const currentRole = authState.role;
+        
+        // Wait a bit longer to ensure Zustand persist middleware has saved to localStorage
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Use window.location.href for a full page reload to ensure clean state
+        // This guarantees that App.tsx will run checkAuth and load the state properly
+        const redirectPath = currentRole === 'team' ? '/my-actions' : '/';
+        window.location.href = redirectPath;
       } else {
         setError('Invalid email or password');
         setIsLoading(false);

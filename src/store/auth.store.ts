@@ -97,9 +97,8 @@ export const useAuthStore = create<AuthStore>()(
           set({ isLoading: true });
           const response = await authService.getCurrentUser();
           
-          // Backend returns: { authenticated, user, role, permissions, isImpersonating, originalUser }
-          // Not wrapped in ApiResponse format
-          if (response.authenticated && response.user) {
+          // Backend returns: { success, authenticated, user, role, permissions, isImpersonating, originalUser }
+          if (response.success && response.authenticated && response.user) {
             set({
               user: response.user,
               role: response.role,

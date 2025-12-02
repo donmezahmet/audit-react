@@ -334,22 +334,41 @@ const DepartmentActionsPage: React.FC = () => {
       statusCounts[action.status] = (statusCounts[action.status] || 0) + 1;
     });
 
-    // Normalize labels and aggregate counts
+    // Normalize labels and aggregate counts - Map "Closed" and "In Progress" to "Completed"
     const normalizedCounts: Record<string, number> = {};
     Object.entries(statusCounts).forEach(([status, count]) => {
-      const normalizedStatus = normalizeStatus(status);
+      let normalizedStatus = normalizeStatus(status);
+      // Map "Closed" and "In Progress" to "Completed" to match exe-dash
+      if (status === 'Closed' || status === 'In Progress') {
+        normalizedStatus = 'Completed';
+      }
       normalizedCounts[normalizedStatus] = (normalizedCounts[normalizedStatus] || 0) + count;
     });
 
     const labels = Object.keys(normalizedCounts);
     const data = Object.values(normalizedCounts);
 
+    // Updated colors to match exe-dash design - birebir aynı (no gray colors)
+    const backgroundColors = {
+      'Open': 'rgba(59, 130, 246, 0.8)',        // Blue
+      'Risk Accepted': 'rgba(147, 51, 234, 0.8)', // Purple
+      'Completed': 'rgba(34, 197, 94, 0.8)',    // Green
+      'Overdue': 'rgba(239, 68, 68, 0.8)',      // Red
+    };
+
+    const borderColors = {
+      'Open': 'rgba(59, 130, 246, 1)',        // Blue
+      'Risk Accepted': 'rgba(147, 51, 234, 1)', // Purple
+      'Completed': 'rgba(34, 197, 94, 1)',    // Green
+      'Overdue': 'rgba(239, 68, 68, 1)',      // Red
+    };
+
     return {
       labels,
       datasets: [{
         data,
-        backgroundColor: labels.map(s => STATUS_COLORS[s] || 'rgba(147, 51, 234, 0.8)'),
-        borderColor: labels.map(s => (STATUS_COLORS[s] || 'rgba(147, 51, 234, 0.8)').replace('0.8', '1')),
+        backgroundColor: labels.map(l => backgroundColors[l as keyof typeof backgroundColors] || 'rgba(34, 197, 94, 0.8)'), // Default to green (Completed) instead of gray
+        borderColor: labels.map(l => borderColors[l as keyof typeof borderColors] || 'rgba(34, 197, 94, 1)'), // Default to green (Completed) instead of gray
         borderWidth: 2,
       }],
     };
