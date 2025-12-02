@@ -1,0 +1,13 @@
+{
+    "name": "Audit Department Executive Dashboard",
+    "short_name": "Audit Dashboard",
+    "description": "Executive dashboard for audit department management",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#5D3EBC",
+    "theme_color": "#5D3EBC",
+    "lang": "en",
+    "scope": "/",
+    "orientation": "portrait-primary",
+    "icons": []
+}
