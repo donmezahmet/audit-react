@@ -20,7 +20,7 @@ const MyActionsPage: React.FC = () => {
   const [riskLevelFilter, setRiskLevelFilter] = useState<string>('all');
   const [selectedManagerEmail, setSelectedManagerEmail] = useState<string | null>(null);
   const [managerInfo, setManagerInfo] = useState<{ manager1: { email: string; name: string }; manager2: { email: string; name: string } } | null>(null);
-  const { role, isImpersonating, originalUser, startImpersonation } = useAuthStore();
+  const { user, role, isImpersonating, originalUser, startImpersonation } = useAuthStore();
   const { isExporting, exportFindingActions } = useExport();
   const tableRef = useRef<HTMLTableElement>(null);
   
@@ -115,7 +115,7 @@ const MyActionsPage: React.FC = () => {
     },
     summary: {
       label: 'Summary',
-      render: (action) => <span className="font-medium text-gray-900 line-clamp-2">{action.summary}</span>
+      render: (action) => <span className="text-xs font-medium text-gray-900 line-clamp-2">{action.summary}</span>
     },
     description: {
       label: 'Description',
@@ -126,7 +126,7 @@ const MyActionsPage: React.FC = () => {
       sortable: true,
       sortKey: 'displayStatus',
       render: (action) => (
-        <Badge variant={getStatusBadge(action.status)}>
+        <Badge variant={getStatusBadge(action.status)} size="sm" className="justify-center whitespace-nowrap">
           {action.displayStatus}
         </Badge>
       )
@@ -182,37 +182,51 @@ const MyActionsPage: React.FC = () => {
     }
   };
 
+  // Determine userEmail for filtering
+  const userEmailForFilter = useMemo(() => {
+    if (isImpersonating) {
+      // When impersonating, use the impersonated user's email
+      return user?.email;
+    } else if (role === 'admin') {
+      // Admin sees all when not impersonating
+      return undefined;
+    } else {
+      // Regular users see their own actions
+      return user?.email;
+    }
+  }, [isImpersonating, role, user?.email]);
+
   const { data: actionsData, isLoading } = useTeamFindingActions({
     auditYear: scorecardFilter === 'all' ? undefined : scorecardFilter,
-    managerEmail: selectedManagerEmail || undefined,
+    // Don't use managerEmail when impersonating - use userEmail instead
+    managerEmail: (isImpersonating ? undefined : selectedManagerEmail) || undefined,
+    // Use computed userEmail for filtering
+    userEmail: userEmailForFilter
   });
-
+  
   // Parse response - can be array or object with data and managerInfo
   const actions = useMemo(() => {
     if (!actionsData) return [];
-    if (Array.isArray(actionsData)) return actionsData;
-    return actionsData.data || [];
+    const parsed = Array.isArray(actionsData) ? actionsData : (actionsData.data || []);
+    return parsed;
   }, [actionsData]);
 
   // Extract manager info from response
   useEffect(() => {
-    console.log('🔍 MyActionsPage - actionsData:', actionsData);
-    console.log('🔍 MyActionsPage - role:', role);
-    console.log('🔍 MyActionsPage - isImpersonating:', isImpersonating);
-    
     if (actionsData && !Array.isArray(actionsData) && actionsData.managerInfo) {
-      console.log('✅ ManagerInfo found:', actionsData.managerInfo);
       setManagerInfo(actionsData.managerInfo);
-      // Set default selected manager to manager1 if not already set
-      if (!selectedManagerEmail && actionsData.managerInfo.manager1) {
+      // If impersonating, clear selectedManagerEmail to use userEmail filter instead
+      if (isImpersonating) {
+        setSelectedManagerEmail(null);
+      } else if (!selectedManagerEmail && actionsData.managerInfo.manager1) {
+        // Set default selected manager to manager1 if not already set (only when not impersonating)
         setSelectedManagerEmail(actionsData.managerInfo.manager1.email);
       }
     } else if (actionsData && Array.isArray(actionsData)) {
       // No manager info, clear it
-      console.log('⚠️ No managerInfo in response (array format)');
       setManagerInfo(null);
     }
-  }, [actionsData, selectedManagerEmail, role, isImpersonating]);
+  }, [actionsData, selectedManagerEmail, isImpersonating]);
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -322,6 +336,7 @@ const MyActionsPage: React.FC = () => {
 
   // Calculate stats - Her parent sadece 1 kez sayılmalı
   const stats = useMemo(() => {
+    // Use actions (already filtered by userEmail) for stats calculation
     if (!actions || !Array.isArray(actions)) return { total: 0, open: 0, overdue: 0, completed: 0, moneyOpen: 0, moneyOverdue: 0 };
     
     // Open ve Overdue için unique parent'ları bul ve impact'leri topla
@@ -347,7 +362,7 @@ const MyActionsPage: React.FC = () => {
       total: actions.length,
       open: openActions.length,
       overdue: overdueActions.length,
-      completed: actions.filter((a: any) => a.status === 'COMPLETED' || a.status === 'Completed').length,
+      completed: actions.filter((a: any) => a.status === 'COMPLETED' || a.status === 'Completed' || a.status === 'Closed' || a.status === 'In Progress').length,
       moneyOpen,
       moneyOverdue,
     };
@@ -359,7 +374,6 @@ const MyActionsPage: React.FC = () => {
       'Completed': 'success',
       'Open': 'danger',
       'Overdue': 'warning',
-      'In Progress': 'info',
       'RISK ACCEPTED': 'default',
     };
     return map[status] || 'default';

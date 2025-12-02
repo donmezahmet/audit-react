@@ -1,5 +1,6 @@
 import { getMockData, mockChartData, mockFindingActions, mockDropdownOptions } from './mockData.service';
 import type { ApiResponse } from '@/types';
+import * as XLSX from 'xlsx';
 
 // Jira-specific types
 export interface JiraFindingAction {
@@ -564,10 +565,111 @@ export const jiraService = {
   },
 
   // === Export ===
-  exportFindingActions: async (_filters?: any): Promise<Blob> => {
+  exportFindingActions: async (filters?: any): Promise<Blob> => {
     await getMockData('export', null, 200);
-    // Return empty blob for mock
-    return new Blob(['Mock export data'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    
+    // Filter actions based on provided filters
+    let actionsToExport = [...mockFindingActions];
+    
+    // Filter by action keys if provided
+    if (filters?.actionKeys) {
+      const keys = filters.actionKeys.split(',').map((k: string) => k.trim());
+      actionsToExport = actionsToExport.filter(a => keys.includes(a.key));
+    }
+    
+    // Filter by role
+    if (filters?.role) {
+      if (filters.role === 'team') {
+        actionsToExport = actionsToExport.filter(a => a.key.startsWith('AUDIT-4'));
+      } else if (filters.role === 'department') {
+        actionsToExport = actionsToExport.filter(a => a.key.startsWith('AUDIT-3'));
+      } else if (filters.role === 'clevel') {
+        actionsToExport = actionsToExport.filter(a => a.key.startsWith('AUDIT-C'));
+      }
+    }
+    
+    // Filter by audit year
+    if (filters?.auditYear && filters.auditYear !== 'all' && filters.auditYear !== '2024+') {
+      actionsToExport = actionsToExport.filter(a => a.auditYear === filters.auditYear);
+    } else if (filters?.auditYear === '2024+') {
+      actionsToExport = actionsToExport.filter(a => {
+        const year = parseInt(a.auditYear || '0', 10);
+        return year >= 2024;
+      });
+    }
+    
+    // Filter by status
+    if (filters?.statusFilter) {
+      actionsToExport = actionsToExport.filter(a => a.status === filters.statusFilter || a.displayStatus === filters.statusFilter);
+    }
+    
+    // Filter by audit name
+    if (filters?.auditFilter) {
+      actionsToExport = actionsToExport.filter(a => a.auditName === filters.auditFilter);
+    }
+    
+    // Filter by risk level
+    if (filters?.riskLevelFilter) {
+      actionsToExport = actionsToExport.filter(a => a.riskLevel === filters.riskLevelFilter);
+    }
+    
+    // Create Excel workbook
+    const workbook = XLSX.utils.book_new();
+    
+    // Define headers
+    const headers = [
+      'Key',
+      'Summary',
+      'Description',
+      'Status',
+      'Due Date',
+      'Responsible',
+      'Audit Name',
+      'Audit Year',
+      'Risk Level',
+      'C-Level',
+      'Financial Impact'
+    ];
+    
+    // Convert actions to rows
+    const rows = actionsToExport.map((action: any) => [
+      action.key || '',
+      action.summary || '',
+      action.description || '',
+      action.displayStatus || action.status || '',
+      action.dueDate || '',
+      action.responsibleEmail || action.responsible || '',
+      action.auditName || '',
+      action.auditYear || '',
+      action.riskLevel || '',
+      action.cLevel || '',
+      action.monetaryImpact || action.financialImpact || ''
+    ]);
+    
+    // Create worksheet
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 15 }, // Key
+      { wch: 40 }, // Summary
+      { wch: 50 }, // Description
+      { wch: 15 }, // Status
+      { wch: 15 }, // Due Date
+      { wch: 30 }, // Responsible
+      { wch: 30 }, // Audit Name
+      { wch: 12 }, // Audit Year
+      { wch: 15 }, // Risk Level
+      { wch: 15 }, // C-Level
+      { wch: 18 }  // Financial Impact
+    ];
+    
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Finding Actions');
+    
+    // Convert to blob
+    const excelBuffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
+    return new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   },
 
   exportFindingActionsAging: async (): Promise<Blob> => {
@@ -687,7 +789,7 @@ export const jiraService = {
         // filtered already contains all matching status
       } else {
         // Filter by exact year
-        filtered = filtered.filter(a => a.auditYear === auditYear);
+      filtered = filtered.filter(a => a.auditYear === auditYear);
       }
     }
     return getMockData('actions-by-status', filtered);
@@ -748,7 +850,7 @@ export const jiraService = {
       {
         key: 'AUDIT-1005',
         summary: 'Review operational procedures',
-        status: 'In Progress',
+        status: 'Open',
         dueDate: new Date(today.getTime() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
         responsible: 'bob.wilson@example.com',
         auditYear: '2024',
@@ -759,25 +861,37 @@ export const jiraService = {
   },
 
   // Get Team Finding Actions (filtered by customfield_22459 - Manager Email)
-  getTeamFindingActions: async (filters?: { auditYear?: string; managerEmail?: string }): Promise<any> => {
+  getTeamFindingActions: async (filters?: { auditYear?: string; managerEmail?: string; userEmail?: string }): Promise<any> => {
     // Filter actions for team_manager users (actions starting with AUDIT-4)
-    let filtered = mockFindingActions.filter(a => a.key.startsWith('AUDIT-4')) as any[];
+    // IMPORTANT: Start with a fresh copy to avoid any mutations
+    let filtered = mockFindingActions
+      .filter(a => a.key.startsWith('AUDIT-4'))
+      .map(a => ({ ...a })) as any[]; // Create copies to avoid mutations
+    
+    // IMPORTANT: userEmail has priority over managerEmail for impersonation/view as
+    // If userEmail is provided (for impersonation/view as), filter by that user's email
+    // DO NOT modify responsibleEmail values - they are hard-coded in mock data and should remain unchanged
+    if (filters?.userEmail) {
+      filtered = filtered.filter(a => {
+        // Strict equality check - responsibleEmail must match userEmail exactly
+        return a.responsibleEmail === filters.userEmail;
+      });
+    } else if (filters?.managerEmail) {
+      // Only use managerEmail if userEmail is not provided
+      filtered = filtered.filter(a => a.responsibleEmail === filters.managerEmail);
+    }
     
     if (filters?.auditYear && filters.auditYear !== 'all' && filters.auditYear !== '2024+') {
       filtered = filtered.filter(a => a.auditYear === filters.auditYear);
     }
-    // If '2024+' or 'all' or undefined, return all team actions (already filtered by prefix)
-    if (filters?.managerEmail) {
-      filtered = filtered.filter(a => a.responsibleEmail === filters.managerEmail);
-    }
     
     // Return format: { data: [...], managerInfo?: { manager1: {...}, manager2: {...} } }
-    // If managerEmail is provided, return just the array
+    // If managerEmail is provided (specific manager selected), return just the array
     if (filters?.managerEmail) {
       return getMockData('team-finding-actions', filtered);
     }
     
-    // Otherwise return with managerInfo for team_manager role
+    // Otherwise return with managerInfo (for team_manager role or when userEmail is used for impersonation)
     return getMockData('team-finding-actions', {
       data: filtered,
       managerInfo: {

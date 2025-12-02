@@ -313,7 +313,7 @@ export function useUpcomingActions() {
 }
 
 // Hook for Team Finding Actions (filtered by customfield_22459 - Manager Email)
-export function useTeamFindingActions(filters?: { auditYear?: string; managerEmail?: string }) {
+export function useTeamFindingActions(filters?: { auditYear?: string; managerEmail?: string; userEmail?: string }) {
   return useQuery({
     queryKey: ['team-finding-actions', filters],
     queryFn: () => jiraService.getTeamFindingActions(filters),
