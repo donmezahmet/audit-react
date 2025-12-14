@@ -109,10 +109,58 @@ export const useAuthStore = create<AuthStore>()(
               isLoading: false,
             });
           } else {
-            set({ ...initialState, ...initialImpersonationState, isLoading: false });
+            // TEMPORARY: Auto-authenticate with default admin user to bypass login
+            const defaultUser = {
+              id: 1,
+              email: 'mahmut@turan.com',
+              name: 'Mahmut Turan',
+              role: 'admin',
+              is_active: true,
+              must_reset_password: false,
+              created_at: '2024-01-01T00:00:00Z',
+            };
+            
+            // Store in localStorage to simulate session
+            localStorage.setItem('mock_user', JSON.stringify(defaultUser));
+            
+            // Import mockPermissions dynamically
+            const { mockPermissions } = await import('@/services/mockData.service');
+            
+            set({
+              user: defaultUser,
+              role: 'admin',
+              isAuthenticated: true,
+              permissions: mockPermissions,
+              isImpersonating: false,
+              originalUser: null,
+              isLoading: false,
+            });
           }
         } catch (error) {
-          set({ ...initialState, ...initialImpersonationState, isLoading: false });
+          // TEMPORARY: Auto-authenticate with default admin user on error too
+          const defaultUser = {
+            id: 1,
+            email: 'mahmut@turan.com',
+            name: 'Mahmut Turan',
+            role: 'admin',
+            is_active: true,
+            must_reset_password: false,
+            created_at: '2024-01-01T00:00:00Z',
+          };
+          
+          localStorage.setItem('mock_user', JSON.stringify(defaultUser));
+          
+          const { mockPermissions } = await import('@/services/mockData.service');
+          
+          set({
+            user: defaultUser,
+            role: 'admin',
+            isAuthenticated: true,
+            permissions: mockPermissions,
+            isImpersonating: false,
+            originalUser: null,
+            isLoading: false,
+          });
         }
       },
 
