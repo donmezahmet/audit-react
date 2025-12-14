@@ -95,55 +95,22 @@ export const useAuthStore = create<AuthStore>()(
       checkAuth: async () => {
         try {
           set({ isLoading: true });
+          const response = await authService.getCurrentUser();
           
-          // TEMPORARY: Auto-login with mock user to bypass login page
-          const mockUser: User = {
-            id: 1,
-            email: 'admin@example.com',
-            name: 'Admin User',
-            role: 'admin',
-            status: 'active',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          };
-          
-          set({
-            user: mockUser,
-            role: 'admin',
-            isAuthenticated: true,
-            permissions: {
-              charts: [],
-              tasks: {
-                can_view: true,
-                can_create: true,
-                can_edit: true,
-                can_delete: true,
-              },
-              pages: ['*'],
-              components: ['*'],
-              interactiveComponents: ['*'],
-            },
-            isImpersonating: false,
-            originalUser: null,
-            isLoading: false,
-          });
-          
-          // Original code (commented out for temporary bypass):
-          // const response = await authService.getCurrentUser();
-          // // Backend returns: { success, authenticated, user, role, permissions, isImpersonating, originalUser }
-          // if (response.success && response.authenticated && response.user) {
-          //   set({
-          //     user: response.user,
-          //     role: response.role,
-          //     isAuthenticated: true,
-          //     permissions: response.permissions,
-          //     isImpersonating: response.isImpersonating || false,
-          //     originalUser: response.originalUser || null,
-          //     isLoading: false,
-          //   });
-          // } else {
-          //   set({ ...initialState, ...initialImpersonationState, isLoading: false });
-          // }
+          // Backend returns: { success, authenticated, user, role, permissions, isImpersonating, originalUser }
+          if (response.success && response.authenticated && response.user) {
+            set({
+              user: response.user,
+              role: response.role,
+              isAuthenticated: true,
+              permissions: response.permissions,
+              isImpersonating: response.isImpersonating || false,
+              originalUser: response.originalUser || null,
+              isLoading: false,
+            });
+          } else {
+            set({ ...initialState, ...initialImpersonationState, isLoading: false });
+          }
         } catch (error) {
           set({ ...initialState, ...initialImpersonationState, isLoading: false });
         }
