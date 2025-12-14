@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth.store';
 import { QueryProvider } from '@/providers/QueryProvider';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -39,7 +39,8 @@ const App: React.FC = () => {
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             {/* Public routes */}
-            <Route path="/login" element={<LoginPage />} />
+            {/* TEMPORARY: Redirect login to dashboard */}
+            <Route path="/login" element={<Navigate to="/" replace />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
             {/* Protected routes */}
