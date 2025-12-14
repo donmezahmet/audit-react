@@ -5,7 +5,6 @@ import { QueryProvider } from '@/providers/QueryProvider';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import MainLayout from '@/components/layout/MainLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import LoginPage from '@/pages/LoginPage';
 import DashboardPage from '@/pages/DashboardPage';
 import TaskManagerPage from '@/pages/TaskManagerPage';
 import AccessManagementPage from '@/pages/AccessManagementPage';
